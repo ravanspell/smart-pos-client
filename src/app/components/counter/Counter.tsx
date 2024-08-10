@@ -14,9 +14,11 @@ import {
 
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import styles from "./Counter.module.css";
-import { Button } from "../atoms/Button/Button";
+import { Button } from "../atoms/Button";
+import { useToast } from "../atoms/Toast/use-toast";
 
 export const Counter = () => {
+  const {toast} = useToast()
   const dispatch = useAppDispatch();
   const count = useAppSelector(selectCount);
   const status = useAppSelector(selectStatus);
@@ -40,7 +42,13 @@ export const Counter = () => {
         <Button
           // className={styles.button}
           aria-label="Increment value"
-          onClick={() => dispatch(increment())}
+          onClick={() => {
+            toast({
+              title: "this is sample toast",
+              description: "Friday, February 10, 2023 at 5:57 PM",
+            });
+            dispatch(increment())}
+          }
         >
           +
         </Button>

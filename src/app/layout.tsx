@@ -3,6 +3,9 @@ import type { ReactNode } from "react";
 import { StoreProvider } from "../StoreProvider";
 import { Nav } from "./components/Nav";
 import styles from "@/styles/layout.module.css";
+import { Toaster } from "./components/atoms/Toast/toaster";
+// These styles apply to every route in the application
+import '../styles/globals.css';
 
 interface Props {
   readonly children: ReactNode;
@@ -13,6 +16,7 @@ export default function RootLayout({ children }: Props) {
     <StoreProvider>
       <html lang="en">
         <body>
+          <Toaster />
           <section className={styles.container}>
             <Nav />s
             <header className={styles.header}>
