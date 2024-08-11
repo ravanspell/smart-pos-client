@@ -1,12 +1,15 @@
 "use client"
 
 // Inspired by react-hot-toast library
-import * as React from "react"
+// need to put functions/methods in the state
+// therfore, sate implimentation here, 
+// not converting to redux store
+import * as React from "react";
 
 import type {
   ToastActionElement,
   ToastProps,
-} from "./toast"
+} from "@/app/components/atoms/Toast/toast"
 
 const TOAST_LIMIT = 1
 const TOAST_REMOVE_DELAY = 1000000

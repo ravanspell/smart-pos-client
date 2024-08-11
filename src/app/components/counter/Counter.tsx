@@ -15,7 +15,7 @@ import {
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import styles from "./Counter.module.css";
 import { Button } from "../atoms/Button";
-import { useToast } from "../atoms/Toast/use-toast";
+import { useToast } from "@/lib/hooks/useToast";
 
 export const Counter = () => {
   const {toast} = useToast()
