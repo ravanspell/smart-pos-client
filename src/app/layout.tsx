@@ -1,84 +1,32 @@
-import Image from "next/image";
 import type { ReactNode } from "react";
 import { StoreProvider } from "../StoreProvider";
-import { Nav } from "./components/Nav";
-import styles from "@/styles/layout.module.css";
-import { Toaster } from "./components/atoms/Toast/toaster";
+import { Toaster } from "../components/atoms/Toast/toaster";
+import { cn } from "@/lib/utils";
+import { Inter as FontSans } from "next/font/google"
 // These styles apply to every route in the application
-import '../styles/globals.css';
+import './globals.css';
 
 interface Props {
   readonly children: ReactNode;
 }
 
+const fontSans = FontSans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+})
+
 export default function RootLayout({ children }: Props) {
   return (
     <StoreProvider>
-      <html lang="en">
-        <body>
+      <html lang="en" suppressHydrationWarning>
+        <body
+          className={cn(
+            "min-h-screen bg-background font-sans antialiased",
+            fontSans.variable
+          )}
+        >
           <Toaster />
-          <section className={styles.container}>
-            <Nav />s
-            <header className={styles.header}>
-              <Image
-                src="/logo.svg"
-                className={styles.logo}
-                alt="logo"
-                width={100}
-                height={100}
-              />
-            </header>
-
-            <main className={styles.main}>{children}</main>
-
-            <footer className={styles.footer}>
-              <span>Learn </span>
-              <a
-                className={styles.link}
-                href="https://reactjs.org"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                React
-              </a>
-              <span>, </span>
-              <a
-                className={styles.link}
-                href="https://redux.js.org"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Redux
-              </a>
-              <span>, </span>
-              <a
-                className={styles.link}
-                href="https://redux-toolkit.js.org"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Redux Toolkit
-              </a>
-              <span>, </span>
-              <a
-                className={styles.link}
-                href="https://react-redux.js.org"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                React Redux
-              </a>
-              ,<span> and </span>
-              <a
-                className={styles.link}
-                href="https://reselect.js.org"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Reselect
-              </a>
-            </footer>
-          </section>
+          {children}
         </body>
       </html>
     </StoreProvider>
