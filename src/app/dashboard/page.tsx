@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-
 import {
   decrement,
   increment,
@@ -11,13 +10,11 @@ import {
   selectCount,
   selectStatus,
 } from "@/redux/slices/counterSlice";
-
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import styles from "./counter/Counter.module.css";
 import { Button } from "@/components/atoms/Button";
 import { useToast } from "@/lib/hooks/useToast";
 
-const Counter = () => {
+const Dashbaord = () => {
   const {toast} = useToast()
   const dispatch = useAppDispatch();
   const count = useAppSelector(selectCount);
@@ -28,19 +25,17 @@ const Counter = () => {
 
   return (
     <div>
-      <div className='flex flex-row justify-center align-middle'>
-        <button
-          className={styles.button}
+      <div className='flex flex-row justify-center align-middle mb-3'>
+        <Button
           aria-label="Decrement value"
           onClick={() => dispatch(decrement())}
         >
           -
-        </button>
-        <span aria-label="Count" className={styles.value}>
+        </Button>
+        <span aria-label="Count" className="pl-4 pr-4 mt-1 text-base">
           {count}
         </span>
         <Button
-          // className={styles.button}
           aria-label="Increment value"
           onClick={() => {
             toast({
@@ -52,11 +47,10 @@ const Counter = () => {
         >
           +
         </Button>
-        <Button variant="outline">Button</Button>
       </div>
-      <div className={styles.row}>
+      <div className="flex flex-row justify-center align-middle gap-5">
         <input
-          className={styles.textbox}
+          className="text-lg w-16 text-center mr-1 p-1"
           aria-label="Set increment amount"
           value={incrementAmount}
           type="number"
@@ -64,30 +58,27 @@ const Counter = () => {
             setIncrementAmount(e.target.value);
           }}
         />
-        <button
-          className={styles.button}
+        <Button
           onClick={() => dispatch(incrementByAmount(incrementValue))}
         >
           Add Amount
-        </button>
-        <button
-          className={styles.asyncButton}
+        </Button>
+        <Button
           disabled={status !== "idle"}
           onClick={() => dispatch(incrementAsync(incrementValue))}
         >
           Add Async
-        </button>
-        <button
-          className={styles.button}
+        </Button>
+        <Button
           onClick={() => {
             dispatch(incrementIfOdd(incrementValue));
           }}
         >
           Add If Odd
-        </button>
+        </Button>
       </div>
     </div>
   );
 };
 
-export default Counter;
+export default Dashbaord;
