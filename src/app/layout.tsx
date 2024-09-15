@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { StoreProvider } from "../StoreProvider";
 import { Toaster } from "../components/atoms/Toast/toaster";
+import NextTopLoader from 'nextjs-toploader';
 import { cn } from "@/lib/utils";
 import { Inter as FontSans } from "next/font/google"
 import { TailwindIndicator } from "@/components/utilComponents/tailwind-indicator";
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: Props) {
             fontSans.variable
           )}
         >
+          <NextTopLoader showSpinner={false} />
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <Toaster />
             {children}
