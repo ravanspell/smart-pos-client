@@ -31,6 +31,7 @@ import {
 } from "@/components/atoms/DropdownMenu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/atoms/Sheet";
 import type { Metadata } from 'next';
+import { ThemeToggle } from "@/components/utilComponents/theme-toggle";
 
 export const metadata: Metadata = {
   title: 'Next Shadcn Dashboard Starter',
@@ -215,6 +216,7 @@ export default function DashboardLayout({
             <DropdownMenuItem>Logout</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        <ThemeToggle />
       </header>
       <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
         {children}
