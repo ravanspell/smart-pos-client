@@ -3,6 +3,7 @@ import { Meta, StoryObj } from '@storybook/react';
 import Accordion from './index';
 import { Button } from '@/components/atoms/Button';
 import { Badge } from '@/components/atoms/Badge';
+import { MouseEvent } from 'react';
 
 const meta: Meta<typeof Accordion> = {
   title: 'Components/Accordion',
@@ -12,6 +13,11 @@ const meta: Meta<typeof Accordion> = {
 export default meta;
 type Story = StoryObj<typeof Accordion>;
 
+const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+  // stop accordion collapse and expand event from Accordion header.
+  console.log("Button clicked", event.stopPropagation());
+};
+
 export const Default: Story = {
   args: {
     items: [
@@ -19,7 +25,7 @@ export const Default: Story = {
         id: "what-is-shadcn",
         title: "What is Shadcn?",
         content: (
-          <div>
+          <div className='p-4'>
             <p>Shadcn is a set of accessible UI components built for React.</p>
             <Button className="mt-2">Learn More</Button>
           </div>
@@ -30,25 +36,24 @@ export const Default: Story = {
         id: "how-tailwind-works",
         title: "How does Tailwind work?",
         content: (
-          <div>
+          <div className='p-4'>
             <p>
               Tailwind is a utility-first CSS framework that provides flexibility
               and customizability.
             </p>
           </div>
         ),
-        suffix: <Button size="sm">Details</Button>,
       },
       {
         id: "this-is-test-accordion",
         title: "this is test accordion",
         content: (
-          <div>
+          <div className='p-4'>
             <h2>this is sample header</h2>
             <p>this is sample paragraph</p>
           </div>
         ),
-        suffix: <Button size="sm">Details</Button>,
+        suffix: <Button onClick={handleClick} size="sm">Details</Button>,
       },
     ],
   },
