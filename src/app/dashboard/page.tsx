@@ -12,10 +12,10 @@ import {
 } from "@/redux/slices/counterSlice";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { Button } from "@/components/atoms/Button";
-import { useToast } from "@/lib/hooks/useToast";
+import { toast } from "sonner";
+import { FileUploader } from "@/components/molecules/FileUploader";
 
 const Dashbaord = () => {
-  const {toast} = useToast()
   const dispatch = useAppDispatch();
   const count = useAppSelector(selectCount);
   const status = useAppSelector(selectStatus);
@@ -38,10 +38,7 @@ const Dashbaord = () => {
         <Button
           aria-label="Increment value"
           onClick={() => {
-            toast({
-              title: "this is sample toast",
-              description: "Friday, February 10, 2023 at 5:57 PM",
-            });
+            toast("this is sample toast");
             dispatch(increment())}
           }
         >
@@ -77,6 +74,7 @@ const Dashbaord = () => {
           Add If Odd
         </Button>
       </div>
+      <FileUploader />
     </div>
   );
 };

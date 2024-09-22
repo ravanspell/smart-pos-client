@@ -8,7 +8,6 @@ import { Checkbox } from '@/components/atoms/CheckBox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/atoms/DropdownMenu';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/atoms/Table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/atoms/Tabs';
-import { useToast } from "@/lib/hooks/useToast";
 import { MoreVertical } from 'lucide-react';
 
 interface IAppProps {
@@ -16,7 +15,6 @@ interface IAppProps {
 }
 
 const EmployeesPage: React.FC<IAppProps> = (props) => {
-  const { toast } = useToast();
   return (
     <>
       <div className="container mx-auto">
