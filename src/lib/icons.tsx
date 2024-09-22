@@ -30,7 +30,7 @@ import {
     X,
     Bell,
     Upload,
-    FileTextIcon
+    FileTextIcon,
   } from 'lucide-react';
   
   export type Icon = LucideIcon;
