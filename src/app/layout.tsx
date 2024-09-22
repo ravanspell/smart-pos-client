@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { StoreProvider } from "../StoreProvider";
-import { Toaster } from "../components/atoms/Toast/toaster";
+import { Toaster } from "../components/atoms/Toast";
 import NextTopLoader from 'nextjs-toploader';
 import { cn } from "@/lib/utils";
 import { Inter as FontSans } from "next/font/google"
