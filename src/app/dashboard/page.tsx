@@ -14,6 +14,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { Button } from "@/components/atoms/Button";
 import { toast } from "sonner";
 import { FileUploader } from "@/components/molecules/FileUploader";
+import { SubmitButton } from "@/components/molecules/SubmitButton";
 
 const Dashbaord = () => {
   const dispatch = useAppDispatch();
@@ -75,6 +76,7 @@ const Dashbaord = () => {
         </Button>
       </div>
       <FileUploader />
+      <SubmitButton isLoading label="Save"/>
     </div>
   );
 };
