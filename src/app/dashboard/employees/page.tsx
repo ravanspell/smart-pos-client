@@ -8,6 +8,7 @@ import { Checkbox } from '@/components/atoms/CheckBox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/atoms/DropdownMenu';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/atoms/Table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/atoms/Tabs';
+import CreateCandidateModal from '@/components/organisams/CreateCandidateForm';
 import { MoreVertical } from 'lucide-react';
 
 interface IAppProps {
@@ -137,6 +138,7 @@ const EmployeesPage: React.FC<IAppProps> = (props) => {
             {/* You can repeat TabsContent for other tabs */}
           </Tabs>
         </div>
+        <CreateCandidateModal />
       </div>
     </>
   )
