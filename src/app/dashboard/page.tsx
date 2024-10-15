@@ -13,7 +13,7 @@ import {
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { Button } from "@/components/atoms/Button";
 import { toast } from "sonner";
-import { FileUploader } from "@/components/molecules/FileUploader";
+import { FileUploader } from "@/components/organisams/FileUploader";
 import { SubmitButton } from "@/components/molecules/SubmitButton";
 
 const Dashbaord = () => {
@@ -75,7 +75,7 @@ const Dashbaord = () => {
           Add If Odd
         </Button>
       </div>
-      <FileUploader />
+      <FileUploader accept={{"image/*": [], "application/pdf": []}}/>
       <SubmitButton isLoading label="Save"/>
     </div>
   );
