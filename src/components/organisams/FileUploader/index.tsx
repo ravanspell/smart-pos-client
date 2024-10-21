@@ -1,17 +1,19 @@
 "use client"
 
-import * as React from "react"
-import Image from "next/image"
 import Dropzone, {
     type DropzoneProps,
     type FileRejection,
 } from "react-dropzone"
 import { cn, formatBytes } from "@/lib/utils"
-import { Button } from "@/components/atoms/Button"
-import { Progress } from "@/components/atoms/Progress"
 import { ScrollArea } from "@/components/atoms/ScrollArea"
 import { Icons } from "@/lib/icons"
 import { toast } from "sonner"
+import FileCard from "../../molecules/FileCard"
+import { useCallback, useEffect, useState } from "react"
+
+export function isFileWithPreview(file: File): file is File & { preview: string } {
+    return "preview" in file && typeof file.preview === "string"
+}
 
 
 interface FileUploaderProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -107,9 +109,9 @@ export function FileUploader(props: FileUploaderProps) {
         className,
         ...dropzoneProps
     } = props
-    const [files, setFiles] = React.useState<File[]>([])
+    const [files, setFiles] = useState<File[]>([])
 
-    const onDrop = React.useCallback(
+    const onDrop = useCallback(
         (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
             if (!multiple && maxFileCount === 1 && acceptedFiles.length > 1) {
                 toast.error(`Cannot upload more than 1 file at a time`)
@@ -130,28 +132,11 @@ export function FileUploader(props: FileUploaderProps) {
             const updatedFiles = files ? [...files, ...newFiles] : newFiles
 
             setFiles(updatedFiles)
+            console.log("updatedFiles--->", updatedFiles);
 
             if (rejectedFiles.length > 0) {
                 rejectedFiles.forEach(({ file }) => {
                     toast.error(`File ${file.name} was rejected`)
-                })
-            }
-
-            if (
-                onUpload &&
-                updatedFiles.length > 0 &&
-                updatedFiles.length <= maxFileCount
-            ) {
-                const target =
-                    updatedFiles.length > 0 ? `${updatedFiles.length} files` : `file`
-
-                toast.promise(onUpload(updatedFiles), {
-                    loading: `Uploading ${target}...`,
-                    success: () => {
-                        setFiles([])
-                        return `${target} uploaded`
-                    },
-                    error: `Failed to upload ${target}`,
                 })
             }
         },
@@ -167,7 +152,7 @@ export function FileUploader(props: FileUploaderProps) {
     }
 
     // Revoke preview url when component unmounts
-    React.useEffect(() => {
+    useEffect(() => {
         return () => {
             if (!files) return
             files.forEach((file) => {
@@ -249,81 +234,11 @@ export function FileUploader(props: FileUploaderProps) {
                                 key={index}
                                 file={file}
                                 onRemove={() => onRemove(index)}
-                                progress={progresses?.[file.name]}
                             />
                         ))}
                     </div>
                 </ScrollArea>
             ) : null}
         </div>
-    )
-}
-
-interface FileCardProps {
-    file: File
-    onRemove: () => void
-    progress?: number
-}
-
-function FileCard({ file, progress, onRemove }: FileCardProps) {
-    return (
-        <div className="relative flex items-center gap-2.5">
-            <div className="flex flex-1 gap-2.5">
-                {isFileWithPreview(file) ? <FilePreview file={file} /> : null}
-                <div className="flex w-full flex-col gap-2">
-                    <div className="flex flex-col gap-px">
-                        <p className="line-clamp-1 text-sm font-medium text-foreground/80">
-                            {file.name}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                            {formatBytes(file.size)}
-                        </p>
-                    </div>
-                    {progress ? <Progress value={progress} /> : null}
-                </div>
-            </div>
-            <div className="flex items-center gap-2">
-                <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    className="size-7"
-                    onClick={onRemove}
-                >
-                    <Icons.close className="size-4" aria-hidden="true" />
-                    <span className="sr-only">Remove file</span>
-                </Button>
-            </div>
-        </div>
-    )
-}
-
-function isFileWithPreview(file: File): file is File & { preview: string } {
-    return "preview" in file && typeof file.preview === "string"
-}
-
-interface FilePreviewProps {
-    file: File & { preview: string }
-}
-
-function FilePreview({ file }: FilePreviewProps) {
-    if (file.type.startsWith("image/")) {
-        return (
-            <Image
-                src={file.preview}
-                alt={file.name}
-                width={48}
-                height={48}
-                loading="lazy"
-                className="aspect-square shrink-0 rounded-md object-cover"
-            />
-        )
-    }
-
-    return (
-        <Icons.FileTextIcon
-            className="size-10 text-muted-foreground"
-            aria-hidden="true"
-        />
     )
 }
