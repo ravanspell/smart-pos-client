@@ -98,7 +98,7 @@ function FileCard({ file, onRemove }: FileCardProps) {
                             {formatBytes(file.size)}
                         </p>
                     </div>
-                    {uploadPercentage ? <Progress value={uploadPercentage} /> : null}
+                    {uploadPercentage ? <Progress className="h-1" value={uploadPercentage} /> : null}
                 </div>
             </div>
             <div className="flex items-center gap-2">
