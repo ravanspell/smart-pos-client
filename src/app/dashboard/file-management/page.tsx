@@ -33,6 +33,12 @@ import {
     TableHeader,
     TableRow
 } from "@/components/atoms/Table";
+import {
+    useGetBreadcrumbQuery,
+    useGetFolderContentsQuery
+} from "@/redux/api/fileManagmentAPI";
+import { useRouter, useSearchParams } from "next/navigation";
+import { FileOrFolder } from "@/redux/api/types/file-mgt";
 
 interface FileItem {
     id: string;
@@ -44,6 +50,25 @@ interface FileItem {
 }
 
 const FileFolderGrid: React.FC = () => {
+    const router = useRouter();
+    const params = useSearchParams()
+    console.log("folder id",);
+
+    const {
+        data: breadcrumbs,
+        error,
+        isLoading
+    } = useGetBreadcrumbQuery(params.get('folderId'));
+    const {
+        data: filesAndFolders,
+        error: filesAndFoldersError,
+        isLoading: filesAndFoldersIsLoading
+    } = useGetFolderContentsQuery({
+        folderId: params.get('folderId'),
+        page: 1,
+        pageSize: 10
+    })
+
     const [files, setFiles] = useState<FileItem[]>([
         { id: "1", name: "Unicode", isFolder: true, date: "Sep 13, 2013", user: "by ireshan madawa", size: "1 File" },
         { id: "2", name: "Sinhala Fonts", isFolder: true, date: "Sep 26, 2013", user: "by ireshan madawa", size: "33 Files" },
@@ -67,14 +92,14 @@ const FileFolderGrid: React.FC = () => {
         );
     };
 
-    const handleDownload = (item: FileItem) => {
+    const handleDownload = (item) => {
     };
 
-    const handleDelete = (item: FileItem) => {
-        setFiles((prev) => prev.filter((file) => file.id !== item.id));
+    const handleDelete = (item) => {
+        // setFiles((prev) => prev.filter((file) => file.id !== item.id));
     };
 
-    const handleRename = (item: FileItem) => {
+    const handleRename = (item) => {
         const newName = prompt(`Rename ${item.name} to:`, item.name);
         if (newName) {
             setFiles((prev) =>
@@ -100,6 +125,12 @@ const FileFolderGrid: React.FC = () => {
         });
 
         setFiles(sortedFiles);
+    };
+
+    const goToFolder = (entity: FileOrFolder) => {
+        if (entity.folder) {
+            router.push(`/dashboard/file-management?folderId=${entity.id}`);
+        }
     };
 
     return (
@@ -157,8 +188,8 @@ const FileFolderGrid: React.FC = () => {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {files.map((file) => (
-                            <TableRow key={file.id} className="cursor-pointer hover:bg-gray-100">
+                        {filesAndFolders?.data.filesAndFolders.map((file) => (
+                            <TableRow key={file.id} className="cursor-pointer hover:bg-gray-100" onClick={() => goToFolder(file)}>
                                 {/* File/Folder name */}
                                 <TableCell>
                                     <div className="flex items-center space-x-4">
@@ -167,7 +198,7 @@ const FileFolderGrid: React.FC = () => {
                                     </div>
                                 </TableCell>
                                 {/* Updated date */}
-                                <TableCell>{file.date} {file.user}</TableCell>
+                                <TableCell>{file.uploadedAt} By Ireshan</TableCell>
                                 {/* File size */}
                                 <TableCell>{file.size}</TableCell>
                                 {/* Checkbox for selection */}
@@ -186,7 +217,7 @@ const FileFolderGrid: React.FC = () => {
             {/* Render grid view if enabled */}
             {isGridView && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {files.map((file) => (
+                    {filesAndFolders?.data.filesAndFolders.map((file) => (
                         <ContextMenu key={file.id}>
                             <ContextMenuTrigger>
                                 <div
@@ -221,8 +252,8 @@ const FileFolderGrid: React.FC = () => {
                                     <div className="flex flex-col items-center">
                                         <FolderIcon className="h-16 w-16 text-yellow-400 mb-4" />
                                         <p className="font-medium text-center">{file.name}</p>
-                                        <p className="text-sm text-gray-500">{file.date}</p>
-                                        <p className="text-sm text-gray-500">{file.user}</p>
+                                        <p className="text-sm text-gray-500">{file.createdAt}</p>
+                                        <p className="text-sm text-gray-500">Ireshan</p>
                                     </div>
                                 </div>
                             </ContextMenuTrigger>
