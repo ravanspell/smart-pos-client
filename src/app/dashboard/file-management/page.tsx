@@ -40,6 +40,7 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { FileOrFolder } from "@/redux/api/types/file-mgt";
 import { formatBytes } from "@/lib/utils";
+import BreadcrumbComponent from "@/components/molecules/Breadcrumb";
 
 interface FileItem {
     id: string;
@@ -84,7 +85,7 @@ const FileFolderGrid: React.FC = () => {
     ]);
 
     const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
-    const [isGridView, setIsGridView] = useState(true); // State to toggle between grid and list view
+    const [isGridView, setIsGridView] = useState(false); // State to toggle between grid and list view
     const [sortColumn, setSortColumn] = useState<string>("name");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
@@ -135,16 +136,20 @@ const FileFolderGrid: React.FC = () => {
         }
     };
 
+    const bc = (breadcrumbs?.data?.parentFolderIds || []).map((breadcrumb) => ({ label: breadcrumb.name, href: `/dashboard/file-management?folderId=${breadcrumb.id}` })) as [];
+
     return (
         <div className="p-4 relative">
             {/* Switch between grid and list view */}
             {selectedFiles.length === 0 && (
                 <div className="flex justify-between items-center mb-4">
                     <div className="flex gap-2">
-                        <h3 className="text-xl font-bold">all files</h3>
-                        {breadcrumbs?.data.parentFolderIds.map((breadcrumb) => (
-                            <h3 className="text-xl font-bold"> {">"} {breadcrumb.name}</h3>
-                        ))}
+                        <BreadcrumbComponent
+                            items={[
+                                { label: "My files", href: "/dashboard/file-management" },
+                                ...bc,
+                            ]}
+                        />
                     </div>
                     <div className="space-x-2">
                         <Button onClick={() => setIsGridView(true)} className={isGridView ? "bg-blue-500 text-white" : ""}>
