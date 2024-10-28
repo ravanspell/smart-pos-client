@@ -50,7 +50,7 @@ import {
     trash: Trash,
     employee: UserX2Icon,
     post: FileText,
-    page: File,
+    file: File,
     media: Image,
     settings: Settings,
     billing: CreditCard,

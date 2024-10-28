@@ -39,6 +39,7 @@ import {
 } from "@/redux/api/fileManagmentAPI";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FileOrFolder } from "@/redux/api/types/file-mgt";
+import { formatBytes } from "@/lib/utils";
 
 interface FileItem {
     id: string;
@@ -52,19 +53,20 @@ interface FileItem {
 const FileFolderGrid: React.FC = () => {
     const router = useRouter();
     const params = useSearchParams()
-    console.log("folder id",);
+    const folderId = params.get('folderId') || '';
 
     const {
         data: breadcrumbs,
         error,
         isLoading
-    } = useGetBreadcrumbQuery(params.get('folderId'));
+    } = useGetBreadcrumbQuery(folderId, { skip: !folderId });
+
     const {
         data: filesAndFolders,
         error: filesAndFoldersError,
         isLoading: filesAndFoldersIsLoading
     } = useGetFolderContentsQuery({
-        folderId: params.get('folderId'),
+        folderId,
         page: 1,
         pageSize: 10
     })
@@ -138,7 +140,12 @@ const FileFolderGrid: React.FC = () => {
             {/* Switch between grid and list view */}
             {selectedFiles.length === 0 && (
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold">UPDATED ↑</h2>
+                    <div className="flex gap-2">
+                        <h3 className="text-xl font-bold">all files</h3>
+                        {breadcrumbs?.data.parentFolderIds.map((breadcrumb) => (
+                            <h3 className="text-xl font-bold"> {">"} {breadcrumb.name}</h3>
+                        ))}
+                    </div>
                     <div className="space-x-2">
                         <Button onClick={() => setIsGridView(true)} className={isGridView ? "bg-blue-500 text-white" : ""}>
                             <LayoutGridIcon className="h-5 w-5" />
@@ -200,7 +207,7 @@ const FileFolderGrid: React.FC = () => {
                                 {/* Updated date */}
                                 <TableCell>{file.uploadedAt} By Ireshan</TableCell>
                                 {/* File size */}
-                                <TableCell>{file.size}</TableCell>
+                                <TableCell>{file.folder ? `${file.fileCount} Files` : formatBytes(file.size as number)}</TableCell>
                                 {/* Checkbox for selection */}
                                 <TableCell className="text-center">
                                     <Checkbox
