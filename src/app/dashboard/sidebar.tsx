@@ -36,6 +36,12 @@ export const navItems: any[] = [
         label: 'kanban'
     },
     {
+        title: 'File Management',
+        href: '/dashboard/file-management',
+        icon: 'file',
+        label: 'file management'
+    },
+    {
         title: 'Login',
         href: '/',
         icon: 'login',
