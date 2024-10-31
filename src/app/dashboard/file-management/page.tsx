@@ -42,6 +42,7 @@ import { FileOrFolder } from "@/redux/api/types/file-mgt";
 import { formatBytes } from "@/lib/utils";
 import BreadcrumbComponent from "@/components/molecules/Breadcrumb";
 import CreateFolderModal from "@/components/organisams/CreateFolderModal";
+import { Icons } from "@/lib/icons";
 
 interface FileItem {
     id: string;
@@ -161,9 +162,19 @@ const FileFolderGrid: React.FC = () => {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
-                                <DropdownMenuItem onClick={() => { }}>File upload</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => { }}>
+                                    <div className="flex items-center gap-1">
+                                        <Icons.Upload size={16} />
+                                        <span>File upload</span>
+                                    </div>
+                                </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={() => setIsOpenCreateFolderModal(true)}>Folder</DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => setIsOpenCreateFolderModal(true)}>
+                                    <div className="flex items-center gap-1">
+                                        <Icons.FolderIcon size={16} />
+                                        <span>Folder</span>
+                                    </div>
+                                </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
