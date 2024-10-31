@@ -11,15 +11,15 @@ import {
     DropdownMenu,
     DropdownMenuTrigger,
     DropdownMenuContent,
-    DropdownMenuItem
+    DropdownMenuItem,
+    DropdownMenuSeparator
 } from "@/components/atoms/DropdownMenu";
 import {
     CopyIcon,
     DownloadIcon,
     EllipsisVerticalIcon,
     FolderIcon,
-    LayoutGridIcon,
-    LayoutListIcon,
+    PlusIcon,
     ShareIcon,
     TrashIcon
 } from "lucide-react";
@@ -41,6 +41,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { FileOrFolder } from "@/redux/api/types/file-mgt";
 import { formatBytes } from "@/lib/utils";
 import BreadcrumbComponent from "@/components/molecules/Breadcrumb";
+import CreateFolderModal from "@/components/organisams/CreateFolderModal";
 
 interface FileItem {
     id: string;
@@ -88,6 +89,7 @@ const FileFolderGrid: React.FC = () => {
     const [isGridView, setIsGridView] = useState(false); // State to toggle between grid and list view
     const [sortColumn, setSortColumn] = useState<string>("name");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+    const [isOpenCreateFolderModal, setIsOpenCreateFolderModal] = useState<boolean>(false);
 
     const handleCheckboxChange = (id: string) => {
         setSelectedFiles((prev) =>
@@ -152,12 +154,18 @@ const FileFolderGrid: React.FC = () => {
                         />
                     </div>
                     <div className="space-x-2">
-                        <Button onClick={() => setIsGridView(true)} className={isGridView ? "bg-blue-500 text-white" : ""}>
-                            <LayoutGridIcon className="h-5 w-5" />
-                        </Button>
-                        <Button onClick={() => setIsGridView(false)} className={!isGridView ? "bg-blue-500 text-white" : ""}>
-                            <LayoutListIcon className="h-5 w-5" />
-                        </Button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button >
+                                    New <PlusIcon />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuItem onClick={() => { }}>File upload</DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem onClick={() => setIsOpenCreateFolderModal(true)}>Folder</DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </div>
             )}
@@ -278,6 +286,12 @@ const FileFolderGrid: React.FC = () => {
                     ))}
                 </div>
             )}
+            {isOpenCreateFolderModal &&
+                <CreateFolderModal
+                    isOpen={isOpenCreateFolderModal}
+                    onClose={() => setIsOpenCreateFolderModal(false)}
+                />
+            }
         </div>
     );
 };
