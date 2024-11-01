@@ -43,6 +43,7 @@ import { formatBytes } from "@/lib/utils";
 import BreadcrumbComponent from "@/components/molecules/Breadcrumb";
 import CreateFolderModal from "@/components/organisams/CreateFolderModal";
 import { Icons } from "@/lib/icons";
+import FileIcon from "@/components/molecules/FileIcons";
 
 interface FileItem {
     id: string;
@@ -224,8 +225,7 @@ const FileFolderGrid: React.FC = () => {
                                 {/* File/Folder name */}
                                 <TableCell>
                                     <div className="flex items-center space-x-4">
-                                        <FolderIcon className="h-6 w-6 text-yellow-400" />
-                                        <span>{file.name}</span>
+                                        <FileIcon fileName={file.name} />
                                     </div>
                                 </TableCell>
                                 {/* Updated date */}
