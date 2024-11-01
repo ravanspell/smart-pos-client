@@ -212,8 +212,8 @@ const FileFolderGrid: React.FC = () => {
                             <TableHead className="cursor-pointer" onClick={() => handleSort("date")}>
                                 UPDATED {sortColumn === "date" && (sortDirection === "asc" ? "↑" : "↓")}
                             </TableHead>
-                            <TableHead className="cursor-pointer" onClick={() => handleSort("size")}>
-                                SIZE {sortColumn === "size" && (sortDirection === "asc" ? "↑" : "↓")}
+                            <TableHead >
+                                SIZE
                             </TableHead>
                             <TableHead className="text-center" />
                         </TableRow>
@@ -229,7 +229,7 @@ const FileFolderGrid: React.FC = () => {
                                     </div>
                                 </TableCell>
                                 {/* Updated date */}
-                                <TableCell>{file.uploadedAt} By Ireshan</TableCell>
+                                <TableCell>{file.updatedAt} By {file.updatedBy}</TableCell>
                                 {/* File size */}
                                 <TableCell>{file.folder ? `${file.fileCount} Files` : formatBytes(file.size as number)}</TableCell>
                                 {/* Checkbox for selection */}
