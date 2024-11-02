@@ -39,7 +39,7 @@ import {
 } from "@/redux/api/fileManagmentAPI";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FileOrFolder } from "@/redux/api/types/file-mgt";
-import { formatBytes } from "@/lib/utils";
+import { formatBytes, formatDate } from "@/lib/utils";
 import BreadcrumbComponent from "@/components/molecules/Breadcrumb";
 import CreateFolderModal from "@/components/organisams/CreateFolderModal";
 import { Icons } from "@/lib/icons";
@@ -141,7 +141,7 @@ const FileFolderGrid: React.FC = () => {
     };
 
     const bc = (breadcrumbs?.data?.parentFolderIds || []).map((breadcrumb) => ({ label: breadcrumb.name, href: `/dashboard/file-management?folderId=${breadcrumb.id}` })) as [];
-
+    //  ...folderId ? bc: [],
     return (
         <div className="p-4 relative">
             {/* Switch between grid and list view */}
@@ -151,7 +151,6 @@ const FileFolderGrid: React.FC = () => {
                         <BreadcrumbComponent
                             items={[
                                 { label: "My files", href: "/dashboard/file-management" },
-                                ...bc,
                             ]}
                         />
                     </div>
@@ -221,7 +220,7 @@ const FileFolderGrid: React.FC = () => {
                     </TableHeader>
                     <TableBody>
                         {filesAndFolders?.data.filesAndFolders.map((file) => (
-                            <TableRow key={file.id} className="cursor-pointer hover:bg-gray-100" onClick={() => goToFolder(file)}>
+                            <TableRow key={file.id} className="cursor-pointer" onClick={() => goToFolder(file)}>
                                 {/* File/Folder name */}
                                 <TableCell>
                                     <div className="flex items-center space-x-4">
@@ -229,7 +228,7 @@ const FileFolderGrid: React.FC = () => {
                                     </div>
                                 </TableCell>
                                 {/* Updated date */}
-                                <TableCell>{file.updatedAt} By {file.updatedBy}</TableCell>
+                                <TableCell>{formatDate(file?.updatedAt || '')} By {file.updatedBy}</TableCell>
                                 {/* File size */}
                                 <TableCell>{file.folder ? `${file.fileCount} Files` : formatBytes(file.size as number)}</TableCell>
                                 {/* Checkbox for selection */}
