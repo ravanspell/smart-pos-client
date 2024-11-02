@@ -2,8 +2,10 @@ import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
+import utc from 'dayjs/plugin/utc'; 
 
 dayjs.extend(localizedFormat);
+dayjs.extend(utc); 
 
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs))
@@ -46,4 +48,20 @@ export function formatDate(date: Date | string | number, format: string = 'MMM D
   }
   // Convert the date from UTC to local time and format it
   return dayjs(date).format(format);
+}
+
+/**
+ * Converts a given local date-time to UTC and returns it as an ISO string.
+ *
+ * @param {Date | string | number} date - The local date to convert. Can be a Date object, a string, or a timestamp.
+ * @returns {string} - The date-time as an ISO string in UTC.
+ * @throws {Error} - Throws an error if the input date is invalid.
+ */
+export function convertToUTC(date: Date | string | number): string {
+  // Check if the input is a valid date instance
+  if (!dayjs(date).isValid()) {
+    throw new Error('Invalid date');
+  }
+  // Convert the date to UTC and return as ISO string
+  return dayjs(date).utc().toISOString();
 }
