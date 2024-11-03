@@ -75,6 +75,7 @@ const FileFolderGrid: React.FC = () => {
         pageSize: 10
     })
 
+
     const [files, setFiles] = useState<FileItem[]>([
         { id: "1", name: "Unicode", isFolder: true, date: "Sep 13, 2013", user: "by ireshan madawa", size: "1 File" },
         { id: "2", name: "Sinhala Fonts", isFolder: true, date: "Sep 26, 2013", user: "by ireshan madawa", size: "33 Files" },
@@ -99,7 +100,21 @@ const FileFolderGrid: React.FC = () => {
         );
     };
 
-    const handleDownload = (item) => {
+    const handleDownload = async (ids: string[]) => {
+        try {
+            console.log("log --->", ids);
+
+            const link = document.createElement('a');
+            link.href = `http://localhost:3001/api/file-management/download?ids=${ids.join(',')}`;
+            link.style.display = 'none';
+            // Set the target to _blank to avoid navigating away from the current page
+            link.setAttribute('target', '_blank');
+            document.body.appendChild(link);
+            link.click(); // Programmatically trigger the download
+            document.body.removeChild(link); // Clean up
+        } catch (error) {
+            console.error('Error downloading files:', error);
+        }
     };
 
     const handleDelete = (item) => {
@@ -185,7 +200,7 @@ const FileFolderGrid: React.FC = () => {
                 <div className="flex justify-between items-center mb-4">
                     <p>{selectedFiles.length} item(s) selected</p>
                     <div className="space-x-4">
-                        <Button className="p-2">
+                        <Button onClick={() => handleDownload(selectedFiles)} className="p-2">
                             <DownloadIcon className="h-5 w-5 text-gray-500" />
                         </Button>
                         <Button className="p-2">

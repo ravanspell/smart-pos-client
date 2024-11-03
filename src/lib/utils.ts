@@ -65,3 +65,21 @@ export function convertToUTC(date: Date | string | number): string {
   // Convert the date to UTC and return as ISO string
   return dayjs(date).utc().toISOString();
 }
+
+/**
+ * Triggers a file download in the browser.
+ * 
+ * @param {Blob} data - The data to be downloaded, in Blob format.
+ * @param {string} fileName - The name for the downloaded file.
+ */
+export const triggerFileDownload = (data: Blob, fileName: string) => {
+  const url = window.URL.createObjectURL(data);
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', fileName);
+  document.body.appendChild(link);
+  link.click();
+  if (link.parentNode) {
+    link.parentNode.removeChild(link);
+  }
+};
