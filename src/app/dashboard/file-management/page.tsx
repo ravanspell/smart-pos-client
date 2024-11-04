@@ -44,6 +44,7 @@ import BreadcrumbComponent from "@/components/molecules/Breadcrumb";
 import CreateFolderModal from "@/components/organisams/CreateFolderModal";
 import { Icons } from "@/lib/icons";
 import FileIcon from "@/components/molecules/FileIcons";
+import FileUploadModal from "@/components/organisams/FileUploadModal";
 
 interface FileItem {
     id: string;
@@ -93,6 +94,7 @@ const FileFolderGrid: React.FC = () => {
     const [sortColumn, setSortColumn] = useState<string>("name");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
     const [isOpenCreateFolderModal, setIsOpenCreateFolderModal] = useState<boolean>(false);
+    const [isOpenFileUploaderModal, setIsOpenFileUploaderModal] = useState<boolean>(false);
 
     const handleCheckboxChange = (id: string) => {
         setSelectedFiles((prev) =>
@@ -177,7 +179,7 @@ const FileFolderGrid: React.FC = () => {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
-                                <DropdownMenuItem onClick={() => { }}>
+                                <DropdownMenuItem onClick={() => setIsOpenFileUploaderModal(true)}>
                                     <div className="flex items-center gap-1">
                                         <Icons.Upload size={16} />
                                         <span>File upload</span>
@@ -315,6 +317,12 @@ const FileFolderGrid: React.FC = () => {
                 <CreateFolderModal
                     isOpen={isOpenCreateFolderModal}
                     onClose={() => setIsOpenCreateFolderModal(false)}
+                />
+            }
+            {isOpenFileUploaderModal &&
+                <FileUploadModal
+                    isOpen={isOpenFileUploaderModal}
+                    onClose={() => setIsOpenFileUploaderModal(false)}
                 />
             }
         </div>
