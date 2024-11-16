@@ -1,6 +1,7 @@
 import type { Action, ThunkAction } from "@reduxjs/toolkit";
 import { configureStore } from "@reduxjs/toolkit";
 import rootReducer from './slices'
+import { fileManagementApi } from "./api/fileManagmentAPI";
 // Infer the `RootState` type from the root reducer
 export type RootState = ReturnType<typeof rootReducer>;
 
@@ -11,9 +12,8 @@ export type RootState = ReturnType<typeof rootReducer>;
 export const makeStore = () => {
   return configureStore({
     reducer: rootReducer,
-    middleware: (getDefaultMiddleware) => {
-      return getDefaultMiddleware();
-    },
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware().concat(fileManagementApi.middleware),
   });
 };
 

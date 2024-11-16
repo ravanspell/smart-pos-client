@@ -93,7 +93,7 @@ interface FileUploaderProps extends React.HTMLAttributes<HTMLDivElement> {
     disabled?: boolean
 }
 
-export function FileUploader(props: FileUploaderProps) {
+function FileUploader(props: FileUploaderProps) {
     const {
         value: valueProp,
         onValueChange,
@@ -227,7 +227,7 @@ export function FileUploader(props: FileUploaderProps) {
                 )}
             </Dropzone>
             {files?.length ? (
-                <ScrollArea className="h-fit w-full px-3">
+                <ScrollArea className="h-fit w-full">
                     <div className="flex max-h-48 flex-col gap-4">
                         {files?.map((file, index) => (
                             <FileCard
@@ -242,3 +242,5 @@ export function FileUploader(props: FileUploaderProps) {
         </div>
     )
 }
+
+export default FileUploader;

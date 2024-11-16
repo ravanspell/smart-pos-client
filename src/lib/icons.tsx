@@ -31,6 +31,8 @@ import {
     Bell,
     Upload,
     FileTextIcon,
+    FolderIcon,
+    EllipsisIcon,
   } from 'lucide-react';
   
   export type Icon = LucideIcon;
@@ -48,7 +50,7 @@ import {
     trash: Trash,
     employee: UserX2Icon,
     post: FileText,
-    page: File,
+    file: File,
     media: Image,
     settings: Settings,
     billing: CreditCard,
@@ -65,6 +67,8 @@ import {
     Bell: Bell,
     Upload: Upload,
     FileTextIcon: FileTextIcon,
+    FolderIcon: FolderIcon,
+    EllipsisIcon: EllipsisIcon,
     gitHub: ({ ...props }: LucideProps) => (
       <svg
         aria-hidden="true"
