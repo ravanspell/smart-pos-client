@@ -1,15 +1,15 @@
+import { useEffect, useState } from "react";
 import { Button } from "@/components/atoms/Button";
 import { Progress } from "@/components/atoms/Progress";
 import { Icons } from "@/lib/icons";
 import { formatBytes } from "@/lib/utils";
-import { useEffect, useState } from "react";
-import FilePreview from "../FilePreview";
-import { isFileWithPreview } from "../../organisams/FileUploader";
 
 interface FileCardProps {
     file: File
     onRemove: () => void
 }
+
+const UPLOAD_COMPLATED = 100; // 100%
 
 function FileCard({ file, onRemove }: FileCardProps) {
     const [uploadPercentage, setUploadPercentage] = useState(0);
@@ -25,12 +25,12 @@ function FileCard({ file, onRemove }: FileCardProps) {
                     fileName: file.name,
                 }),
             });
-            
+
             if (!response.ok) {
                 throw new Error('Failed to get pre-signed URL mmmm');
             }
 
-            const {data} = await response.json();
+            const { data } = await response.json();
             console.log("response--->", data);
             return data.uploadUrl;
         } catch (error) {
@@ -88,7 +88,6 @@ function FileCard({ file, onRemove }: FileCardProps) {
     return (
         <div className="relative flex items-center gap-2.5">
             <div className="flex flex-1 gap-2.5">
-                {isFileWithPreview(file) ? <FilePreview file={file} /> : null}
                 <div className="flex w-full flex-col gap-2">
                     <div className="flex flex-col gap-px">
                         <p className="line-clamp-1 text-sm font-medium text-foreground/80">
@@ -98,7 +97,9 @@ function FileCard({ file, onRemove }: FileCardProps) {
                             {formatBytes(file.size)}
                         </p>
                     </div>
-                    {uploadPercentage ? <Progress className="h-1" value={uploadPercentage} /> : null}
+                    {(uploadPercentage
+                        && (uploadPercentage !== UPLOAD_COMPLATED))
+                        && <Progress className="h-1" value={uploadPercentage} />}
                 </div>
             </div>
             <div className="flex items-center gap-2">

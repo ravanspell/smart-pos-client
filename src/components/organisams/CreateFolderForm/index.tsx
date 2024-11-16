@@ -1,5 +1,3 @@
-// components/CreateFolderForm.tsx
-
 import { FC } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -12,11 +10,10 @@ import {
     FormControl,
     FormMessage,
 } from '@/components/atoms/Form';
-import { SubmitButton } from '@/components/molecules/SubmitButton';
-import { Button } from '@/components/atoms/Button';
 import { Input } from '@/components/atoms/Input';
 import { useCreateFolderMutation } from '@/redux/api/fileManagmentAPI';
 import { useSearchParams } from 'next/navigation';
+import ModalActionButtons from '@/components/molecules/ModalActionButtons';
 
 // Define the validation schema with zod
 const createFolderSchema = z.object({
@@ -75,21 +72,13 @@ const CreateFolderForm: FC<CreateFolderFormProps> = ({ onClose }) => {
                         </FormItem>
                     )}
                 />
-                <div className="flex justify-end gap-2 mt-4">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        onClick={onClose}
-                    >
-                        Cancel
-                    </Button>
-                    <SubmitButton
-                        id="create-folder-submit-btn"
-                        label='Save'
-                        onClick={() => { }}
-                        isLoading={isLoading}
-                    />
-                </div>
+                <ModalActionButtons
+                    secondaryAction={onClose}
+                    primaryAction={() => { }}
+                    primaryId="create-folder-submit-btn"
+                    secondaryId="create-folder-cancel-btn"
+                    isLoading={isLoading}
+                />
             </form>
         </Form>
     );
