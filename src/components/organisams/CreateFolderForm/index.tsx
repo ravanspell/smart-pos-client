@@ -78,6 +78,8 @@ const CreateFolderForm: FC<CreateFolderFormProps> = ({ onClose }) => {
                     primaryId="create-folder-submit-btn"
                     secondaryId="create-folder-cancel-btn"
                     isLoading={isLoading}
+                    primaryLabel='Create'
+                    secondaryLabel='Cancel'
                 />
             </form>
         </Form>

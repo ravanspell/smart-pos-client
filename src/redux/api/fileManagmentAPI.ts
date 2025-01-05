@@ -1,5 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQuery } from './api';
+import { HTTPMethod } from 'http-method-enum';
 import { ApiResponse, FileOrFolder, GetFolderContentsResponse } from './types/file-mgt';
 
 
@@ -37,7 +38,7 @@ export const fileManagementApi = createApi({
         >({
             query: ({ parentId, name }) => ({
                 url: '/file-management/create-folder',
-                method: 'POST',
+                method: HTTPMethod.POST,
                 body: { name, parentId },
             }),
             async onQueryStarted({ parentId }, { dispatch, queryFulfilled }) {
@@ -68,7 +69,7 @@ export const fileManagementApi = createApi({
         >({
             query: ({ folderId, newName }) => ({
                 url: 'rename-folder',
-                method: 'PATCH',
+                method: HTTPMethod.PATCH,
                 body: { folderId, newName },
             }),
             async onQueryStarted({ folderId, parentId }, { dispatch, queryFulfilled }) {
@@ -99,7 +100,7 @@ export const fileManagementApi = createApi({
         >({
             query: ({ fileId, newName }) => ({
                 url: 'rename-file',
-                method: 'PATCH',
+                method: HTTPMethod.PATCH,
                 body: { fileId, newName },
             }),
             async onQueryStarted({ fileId, parentFolderId }, { dispatch, queryFulfilled }) {

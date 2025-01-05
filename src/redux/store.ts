@@ -2,8 +2,15 @@ import type { Action, ThunkAction } from "@reduxjs/toolkit";
 import { configureStore } from "@reduxjs/toolkit";
 import rootReducer from './slices'
 import { fileManagementApi } from "./api/fileManagmentAPI";
+import { authManagementApi } from "./api/authManagementAPI";
 // Infer the `RootState` type from the root reducer
 export type RootState = ReturnType<typeof rootReducer>;
+
+// Middleware grouping for clarity
+const apiMiddlewares = [
+  fileManagementApi.middleware,
+  authManagementApi.middleware,
+];
 
 // `makeStore` encapsulates the store configuration to allow
 // creating unique store instances, which is particularly important for
@@ -13,7 +20,7 @@ export const makeStore = () => {
   return configureStore({
     reducer: rootReducer,
     middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().concat(fileManagementApi.middleware),
+      getDefaultMiddleware().concat(...apiMiddlewares),
   });
 };
 

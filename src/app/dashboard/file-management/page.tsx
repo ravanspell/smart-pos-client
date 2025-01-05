@@ -2,12 +2,6 @@
 
 import React, { useState } from "react";
 import {
-    ContextMenu,
-    ContextMenuTrigger,
-    ContextMenuContent,
-    ContextMenuItem,
-} from "@/components/ui/context-menu";
-import {
     DropdownMenu,
     DropdownMenuTrigger,
     DropdownMenuContent,
@@ -17,8 +11,6 @@ import {
 import {
     CopyIcon,
     DownloadIcon,
-    EllipsisVerticalIcon,
-    FolderIcon,
     PlusIcon,
     ShareIcon,
     TrashIcon
@@ -90,7 +82,6 @@ const FileFolderGrid: React.FC = () => {
     ]);
 
     const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
-    const [isGridView, setIsGridView] = useState(false); // State to toggle between grid and list view
     const [sortColumn, setSortColumn] = useState<string>("name");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
     const [isOpenCreateFolderModal, setIsOpenCreateFolderModal] = useState<boolean>(false);
@@ -158,7 +149,7 @@ const FileFolderGrid: React.FC = () => {
     };
 
     const bc = (breadcrumbs?.data?.parentFolderIds || []).map((breadcrumb) => ({ label: breadcrumb.name, href: `/dashboard/file-management?folderId=${breadcrumb.id}` })) as [];
-    //  ...folderId ? bc: [],
+
     return (
         <div className="p-4 relative">
             {/* Switch between grid and list view */}
@@ -168,6 +159,7 @@ const FileFolderGrid: React.FC = () => {
                         <BreadcrumbComponent
                             items={[
                                 { label: "My files", href: "/dashboard/file-management" },
+                                ...folderId ? bc : []
                             ]}
                         />
                     </div>
@@ -218,101 +210,46 @@ const FileFolderGrid: React.FC = () => {
                 </div>
             )}
 
-            {/* Render table view if not grid view */}
-            {!isGridView && (
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead className="cursor-pointer" onClick={() => handleSort("name")}>
-                                NAME {sortColumn === "name" && (sortDirection === "asc" ? "↑" : "↓")}
-                            </TableHead>
-                            <TableHead className="cursor-pointer" onClick={() => handleSort("date")}>
-                                UPDATED {sortColumn === "date" && (sortDirection === "asc" ? "↑" : "↓")}
-                            </TableHead>
-                            <TableHead >
-                                SIZE
-                            </TableHead>
-                            <TableHead className="text-center" />
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {filesAndFolders?.data.filesAndFolders.map((file) => (
-                            <TableRow key={file.id} className="cursor-pointer" onClick={() => goToFolder(file)}>
-                                {/* File/Folder name */}
-                                <TableCell>
-                                    <div className="flex items-center space-x-4">
-                                        <FileIcon fileName={file.name} />
-                                    </div>
-                                </TableCell>
-                                {/* Updated date */}
-                                <TableCell>{formatDate(file?.updatedAt || '')} By {file.updatedBy}</TableCell>
-                                {/* File size */}
-                                <TableCell>{file.folder ? `${file.fileCount} Files` : formatBytes(file.size as number)}</TableCell>
-                                {/* Checkbox for selection */}
-                                <TableCell className="text-center">
-                                    <Checkbox
-                                        checked={isItemSelected(file.id)}
-                                        onCheckedChange={() => handleCheckboxChange(file.id)}
-                                    />
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            )}
-
-            {/* Render grid view if enabled */}
-            {isGridView && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead className="cursor-pointer" onClick={() => handleSort("name")}>
+                            NAME {sortColumn === "name" && (sortDirection === "asc" ? "↑" : "↓")}
+                        </TableHead>
+                        <TableHead className="cursor-pointer" onClick={() => handleSort("date")}>
+                            UPDATED {sortColumn === "date" && (sortDirection === "asc" ? "↑" : "↓")}
+                        </TableHead>
+                        <TableHead >
+                            SIZE
+                        </TableHead>
+                        <TableHead className="text-center" />
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
                     {filesAndFolders?.data.filesAndFolders.map((file) => (
-                        <ContextMenu key={file.id}>
-                            <ContextMenuTrigger>
-                                <div
-                                    className={`relative group border rounded-lg p-4 bg-white shadow-sm hover:shadow-md cursor-pointer ${isItemSelected(file.id) ? "border-blue-500" : ""
-                                        }`}
-                                >
-                                    {/* Checkbox for selection (only shown on hover) */}
-                                    <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-                                        <Checkbox
-                                            checked={isItemSelected(file.id)}
-                                            onCheckedChange={() => handleCheckboxChange(file.id)}
-                                        />
-                                    </div>
-
-                                    {/* 3-dot button using DropdownMenu */}
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-                                                <Button className="p-1">
-                                                    <EllipsisVerticalIcon className="h-5 w-5 text-gray-500" />
-                                                </Button>
-                                            </div>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent>
-                                            <DropdownMenuItem onClick={() => handleDownload(file)}>Download</DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => handleDelete(file)}>Delete</DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => handleRename(file)}>Rename</DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-
-                                    {/* File/Folder Icon and Details */}
-                                    <div className="flex flex-col items-center">
-                                        <FolderIcon className="h-16 w-16 text-yellow-400 mb-4" />
-                                        <p className="font-medium text-center">{file.name}</p>
-                                        <p className="text-sm text-gray-500">{file.createdAt}</p>
-                                        <p className="text-sm text-gray-500">Ireshan</p>
-                                    </div>
+                        <TableRow key={file.id} className="cursor-pointer" onClick={() => goToFolder(file)}>
+                            {/* File/Folder name */}
+                            <TableCell>
+                                <div className="flex items-center space-x-4">
+                                    <FileIcon fileName={file.name} />
                                 </div>
-                            </ContextMenuTrigger>
-                            <ContextMenuContent>
-                                <ContextMenuItem onClick={() => handleDownload(file)}>Download</ContextMenuItem>
-                                <ContextMenuItem onClick={() => handleDelete(file)}>Delete</ContextMenuItem>
-                                <ContextMenuItem onClick={() => handleRename(file)}>Rename</ContextMenuItem>
-                            </ContextMenuContent>
-                        </ContextMenu>
+                            </TableCell>
+                            {/* Updated date */}
+                            <TableCell>{formatDate(file?.updatedAt || '')} By {file.updatedBy}</TableCell>
+                            {/* File size */}
+                            <TableCell>{file.folder ? `${file.fileCount} Files` : formatBytes(file.size as number)}</TableCell>
+                            {/* Checkbox for selection */}
+                            <TableCell className="text-center">
+                                <Checkbox
+                                    checked={isItemSelected(file.id)}
+                                    onCheckedChange={() => handleCheckboxChange(file.id)}
+                                />
+                            </TableCell>
+                        </TableRow>
                     ))}
-                </div>
-            )}
+                </TableBody>
+            </Table>
+
             {isOpenCreateFolderModal &&
                 <CreateFolderModal
                     isOpen={isOpenCreateFolderModal}
