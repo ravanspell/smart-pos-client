@@ -1,6 +1,11 @@
-import Header from './header';
-import Sidebar from './sideBar';
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+// import Header from './header';
+// import Sidebar from './sideBar';
 import type { Metadata } from 'next';
+import { Separator } from '@/components/ui/separator';
+import BreadcrumbComponent from '@/components/molecules/Breadcrumb';
+import { AppSidebar } from './app-sidebar';
+import Header from './header';
 
 export const metadata: Metadata = {
   title: 'Next Shadcn Dashboard Starter',
@@ -13,12 +18,14 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex">
-      <Sidebar />
-      <main className="w-full flex-1 overflow-hidden">
-        <Header />
-        {children}
-      </main>
-    </div>
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <main className="w-full flex-1 overflow-hidden">
+          <Header />
+          {children}
+        </main>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
