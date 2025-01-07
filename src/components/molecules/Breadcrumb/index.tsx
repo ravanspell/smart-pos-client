@@ -2,7 +2,6 @@ import {
   Breadcrumb,
   BreadcrumbEllipsis,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
@@ -14,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/atoms/DropdownMenu"
 import { Fragment } from "react"
+import Link from "next/link"
 
 interface BreadcrumbData {
   label: string
@@ -31,7 +31,7 @@ function BreadcrumbComponent({ items }: BreadcrumbComponentProps) {
         {/* First breadcrumb item */}
         {items.length > 1 &&
           <BreadcrumbItem key={items[0].label}>
-            <BreadcrumbLink href={items[0].href}>{items[0].label}</BreadcrumbLink>
+            <Link href={items[0].href as string}>{items[0].label}</Link>
           </BreadcrumbItem>
         }
 
@@ -49,7 +49,7 @@ function BreadcrumbComponent({ items }: BreadcrumbComponentProps) {
               <DropdownMenuContent align="start">
                 {items.slice(1, items.length - 2).map((item, index) => (
                   <DropdownMenuItem key={index}>
-                    <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
+                    <Link href={item.href as string}>{item.label}</Link>
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
@@ -62,7 +62,7 @@ function BreadcrumbComponent({ items }: BreadcrumbComponentProps) {
           items.slice(1, items.length - 1).map((item, index) => (
             <Fragment key={index}>
               <BreadcrumbItem >
-                <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
+                <Link href={item.href as string}>{item.label}</Link>
               </BreadcrumbItem>
               <BreadcrumbSeparator key={`seperator_${index}`} />
             </Fragment>
@@ -73,9 +73,7 @@ function BreadcrumbComponent({ items }: BreadcrumbComponentProps) {
           <>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href={items[items.length - 2].href}>
-                {items[items.length - 2].label}
-              </BreadcrumbLink>
+              <Link href={items[items.length - 2].href as string}>{items[items.length - 2].label}</Link>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
