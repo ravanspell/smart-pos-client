@@ -2,15 +2,9 @@
 
 import * as React from "react"
 import {
-    AudioWaveform,
     BookOpen,
     Bot,
-    Command,
-    Frame,
-    GalleryVerticalEnd,
-    Map,
     Origami,
-    PieChart,
     Settings2,
     SquareTerminal,
 } from "lucide-react"
@@ -19,24 +13,29 @@ import { NavMain } from "./nav-main"
 import {
     Sidebar,
     SidebarContent,
-    SidebarFooter,
     SidebarHeader,
     SidebarRail,
 } from "@/components/ui/sidebar"
 import { Separator } from "@/components/ui/separator"
+import {
+    DASHBOARD_ROUTE,
+    EMPLOYEES_ROUTE,
+    FILE_MANAGEMENT_ROUTE,
+    SETTINGS_ROUTE
+} from "@/constants/routes"
 
 
 const data = {
     navMain: [
         {
             title: "Dashboard",
-            url: "/dashboard",
+            url: DASHBOARD_ROUTE,
             icon: SquareTerminal,
             isActive: true,
         },
         {
             title: "Employees",
-            url: "/dashboard/employees",
+            url: EMPLOYEES_ROUTE,
             icon: Bot,
             items: [
                 {
@@ -55,12 +54,11 @@ const data = {
         },
         {
             title: "File Management",
-            url: "/dashboard/file-management",
             icon: BookOpen,
             items: [
                 {
                     title: "Introduction",
-                    url: "/dashboard/file-management",
+                    url: FILE_MANAGEMENT_ROUTE,
                 },
                 {
                     title: "Get Started",
@@ -78,7 +76,7 @@ const data = {
         },
         {
             title: "Settings",
-            url: "#",
+            url: SETTINGS_ROUTE,
             icon: Settings2,
         },
     ],
