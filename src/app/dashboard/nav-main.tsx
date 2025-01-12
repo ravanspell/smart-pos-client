@@ -36,7 +36,7 @@ export function NavMain({
 
     const renderSideBarMenuItemButton = (item: SideBarMenuItem): React.ReactNode => {
         return (
-            <SidebarMenuButton tooltip={item.title}>
+            <SidebarMenuButton key={item.title} tooltip={item.title}>
                 {item.icon && <item.icon />}
                 {item?.url ? (
                     <Link className="w-full" href={item.url} > {item.title} </Link>
