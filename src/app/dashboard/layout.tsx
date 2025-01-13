@@ -23,7 +23,9 @@ export default function DashboardLayout({
       <SidebarInset>
         <main className="w-full flex-1 overflow-hidden">
           <Header />
-          {children}
+          <div className='pt-3 pl-3 mt-3 m-auto'>
+            {children}
+          </div>
         </main>
       </SidebarInset>
     </SidebarProvider>
