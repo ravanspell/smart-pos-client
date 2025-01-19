@@ -21,7 +21,7 @@ import {
     DASHBOARD_ROUTE,
     EMPLOYEES_ROUTE,
     FILE_MANAGEMENT_ROUTE,
-    SETTINGS_ROUTE
+    DEFAULT_SETTINGS_ROUTE
 } from "@/constants/routes"
 
 
@@ -76,7 +76,7 @@ const data = {
         },
         {
             title: "Settings",
-            url: SETTINGS_ROUTE,
+            url: DEFAULT_SETTINGS_ROUTE,
             icon: Settings2,
         },
     ],
