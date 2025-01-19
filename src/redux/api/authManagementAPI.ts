@@ -2,6 +2,7 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQuery } from './api';
 import { HTTPMethod } from 'http-method-enum';
 import { setUserAuthInfo } from '../slices/authSlice';
+import { AUTH } from '@/constants/api';
 
 export type UserCredentials = {
   email: string;
@@ -26,14 +27,14 @@ export const authManagementApi = createApi({
   endpoints: (builder) => ({
     login: builder.mutation<User, UserCredentials>({
       query: (credentials) => ({
-        url: '/auth/login',
+        url: AUTH.LOGIN,
         method: HTTPMethod.POST,
         body: credentials,
       }),
     }),
     getUserAuthInfo: builder.query<ScopesResponse, void>({
       query: () => ({
-        url: '/auth/info',
+        url: AUTH.AUTH_INFO,
         method: HTTPMethod.GET,
       }),
       // set the user scopes in the store
