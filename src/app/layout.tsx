@@ -1,4 +1,6 @@
-import type { ReactNode } from "react";
+"use client"
+
+import { type ReactNode } from "react";
 import { StoreProvider } from "../StoreProvider";
 import { Toaster } from "../components/atoms/Toast";
 import NextTopLoader from 'nextjs-toploader';
@@ -8,6 +10,7 @@ import { TailwindIndicator } from "@/components/utilComponents/tailwind-indicato
 // These styles apply to every route in the application
 import './globals.css';
 import { ThemeProvider } from "@/components/utilComponents/theme-provider";
+import NotificationDisplay from "./notification-display";
 
 interface Props {
   readonly children: ReactNode;
@@ -19,6 +22,7 @@ const fontSans = FontSans({
 })
 
 export default function RootLayout({ children }: Props) {
+
   return (
     <StoreProvider>
       <html lang="en" suppressHydrationWarning>
@@ -28,6 +32,7 @@ export default function RootLayout({ children }: Props) {
             fontSans.variable
           )}
         >
+          <NotificationDisplay />
           <NextTopLoader showSpinner={false} />
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <Toaster />
