@@ -7,6 +7,7 @@ import { AUTH } from '@/constants/api';
 export type UserCredentials = {
   email: string;
   password: string;
+  notificationToken?: string;
 };
 
 export type User = {
