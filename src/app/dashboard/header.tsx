@@ -1,10 +1,12 @@
 'use client'
+
 import { UserNav } from './userNav';
 import { ThemeToggle } from '@/components/utilComponents/theme-toggle';
 import { Notifications } from './notifications';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
 import BreadcrumbComponent from '@/components/molecules/Breadcrumb';
+import { EMPLOYEES_ROUTE } from '@/constants/routes';
 
 export default function Header() {
     return (
@@ -13,7 +15,9 @@ export default function Header() {
                 <div className="flex items-center gap-2 px-4">
                     <SidebarTrigger className="-ml-1" />
                     <Separator orientation="vertical" className="mr-2 h-4" />
-                    <BreadcrumbComponent items={[{ label: 'home', href: '/dashboard/employees' }, { label: 'Dashboard', }]} />
+                    <BreadcrumbComponent
+                        items={[{ label: 'home', href: EMPLOYEES_ROUTE }, { label: 'Dashboard', }]}
+                    />
                 </div>
                 <div className="flex items-center gap-2">
                     <ThemeToggle />
