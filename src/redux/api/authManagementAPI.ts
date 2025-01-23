@@ -49,5 +49,6 @@ export const authManagementApi = createApi({
 
 export const {
   useLoginMutation,
-  useLazyGetUserAuthInfoQuery
+  useLazyGetUserAuthInfoQuery,
+  useGetUserAuthInfoQuery,
 } = authManagementApi;
