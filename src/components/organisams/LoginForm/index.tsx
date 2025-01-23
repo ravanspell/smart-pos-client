@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-// import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import {
     Form,
     FormField,
@@ -15,6 +15,7 @@ import { SubmitButton } from '@/components/molecules/SubmitButton';
 import { useLoginMutation, UserCredentials } from '@/redux/api/authManagementAPI';
 import { Input } from '@/components/atoms/Input';
 import { fetchToken } from '@/lib/firebaseClient';
+import { DASHBOARD_ROUTE } from '@/constants/routes';
 
 // Define Zod schema for validation
 const loginSchema = z.object({
@@ -28,7 +29,7 @@ type LoginFormInputs = z.infer<typeof loginSchema>;
 const LoginFormComponent: React.FC = () => {
     const [login] = useLoginMutation();
     const [isLoginInProgress, setIsLoginInProgress] = useState(false);
-    // const router = useRouter();
+    const router = useRouter();
 
     // Initialize react-hook-form with Shadcn Form
     const form = useForm<LoginFormInputs>({
@@ -59,8 +60,9 @@ const LoginFormComponent: React.FC = () => {
     const onSubmit = async (data: LoginFormInputs) => {
         try {
             setIsLoginInProgress(true);
+            // get the FCM token to send web push notifications.
+            // the token will be attached to the login request at this point.
             const fcmToken = await getNotificationPermissionAndToken();
-            console.log("fcmToken--->", fcmToken);
             const loginData: UserCredentials = {
                 ...data,
             }
@@ -69,8 +71,8 @@ const LoginFormComponent: React.FC = () => {
             }
             await login(loginData).unwrap();
             setIsLoginInProgress(false);
-            // Navigate to /dashboard after successful login
-            // router.push('/dashboard');
+            // Navigate to dashboard after successful login
+            router.push(DASHBOARD_ROUTE);
         } catch (error) {
             setIsLoginInProgress(false);
             console.error('Login error:', error);
