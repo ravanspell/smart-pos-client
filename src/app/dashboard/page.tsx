@@ -13,7 +13,7 @@ import {
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { Button } from "@/components/atoms/Button";
 import { toast } from "sonner";
-import FileUploader from "@/components/organisams/FileUploader";
+import FileUploader from "@/components/organisms/FileUploader";
 import { SubmitButton } from "@/components/molecules/SubmitButton";
 
 const Dashbaord = () => {
