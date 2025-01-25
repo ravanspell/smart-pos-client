@@ -6,19 +6,26 @@ type Breadcrumb = {
   href: string;
 };
 
-type AppState = {
-  theme: 'light' | 'dark'; 
-  notifications: string[];
-  breadcrumbs: Breadcrumb[];
+type ErrorState = {
+  sectionId: string;
+  message: string;
+  type: 'network' | 'validation' | 'server';
 };
 
+
+type AppState = {
+  theme: 'light' | 'dark';
+  notifications: string[];
+  breadcrumbs: Breadcrumb[];
+  errors: Record<string, ErrorState>;
+};
 
 const initialState: AppState = {
   theme: 'light',
   notifications: [],
   breadcrumbs: [],
+  errors: {}
 };
-
 
 export const appSlice = createSlice({
   name: 'app',
@@ -65,6 +72,26 @@ export const appSlice = createSlice({
     clearBreadcrumbs(state) {
       state.breadcrumbs = [];
     },
+    /**
+     * Action to set an error state for a specific section.
+     * @param action - Contains `sectionId` and error details.
+     */
+    setError(
+      state,
+      action: PayloadAction<{ sectionId: string; message: string; type: 'network' | 'validation' | 'server' }>
+    ) {
+      const { sectionId, message, type } = action.payload;
+      state.errors[sectionId] = { sectionId, message, type };
+    },
+
+    /**
+     * Action to clear an error state for a specific section.
+     * @param action - Contains the `sectionId` to clear.
+     */
+    clearError(state, action: PayloadAction<{ sectionId: string }>) {
+      const { sectionId } = action.payload;
+      delete state.errors[sectionId];
+    },
   },
   selectors: {
     /**
@@ -87,6 +114,7 @@ export const appSlice = createSlice({
      * @returns The current breadcrumbs array.
      */
     getBreadcrumbs: (app: AppState) => app.breadcrumbs,
+    getSectionError: (app: AppState, errorId: string) => app.errors[errorId]
   },
 });
 
@@ -99,9 +127,21 @@ export const {
   clearNotifications,
   setBreadcrumbs,
   clearBreadcrumbs,
+  setError,
+  clearError
 } = appSlice.actions;
 
 /**
  * Default export of the application reducer.
  */
+export const {
+  getBreadcrumbs,
+  getNotifications,
+  getSectionError
+} = appSlice.selectors;
+
+/**
+ * Default export of the application reducer.
+ */
 export default appSlice.reducer;
+
