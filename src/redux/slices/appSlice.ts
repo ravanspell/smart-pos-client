@@ -1,3 +1,5 @@
+import { ErrorType } from '@/constants';
+import { IconEnum } from '@/lib/icons';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 
@@ -6,10 +8,18 @@ type Breadcrumb = {
   href: string;
 };
 
-type ErrorState = {
+export type ErrorState = {
   sectionId: string;
   message: string;
-  type: 'network' | 'validation' | 'server';
+  type: ErrorType
+  icon?: '';
+};
+
+export type ToastState = {
+  display: boolean;
+  message: string;
+  type: string;
+  icon?: any;
 };
 
 
@@ -18,13 +28,20 @@ type AppState = {
   notifications: string[];
   breadcrumbs: Breadcrumb[];
   errors: Record<string, ErrorState>;
+  toast: ToastState;
 };
 
 const initialState: AppState = {
   theme: 'light',
   notifications: [],
   breadcrumbs: [],
-  errors: {}
+  errors: {},
+  toast: {
+    display: false,
+    type: 'success',
+    message: '',
+    icon: IconEnum.circleCheckIcon,
+  }
 };
 
 export const appSlice = createSlice({
@@ -78,7 +95,7 @@ export const appSlice = createSlice({
      */
     setError(
       state,
-      action: PayloadAction<{ sectionId: string; message: string; type: 'network' | 'validation' | 'server' }>
+      action: PayloadAction<{ sectionId: string; message: string; type: ErrorState['type'] }>
     ) {
       const { sectionId, message, type } = action.payload;
       state.errors[sectionId] = { sectionId, message, type };
@@ -91,6 +108,26 @@ export const appSlice = createSlice({
     clearError(state, action: PayloadAction<{ sectionId: string }>) {
       const { sectionId } = action.payload;
       delete state.errors[sectionId];
+    },
+    /**
+     * Action to show a toast notification.
+     * @param state - The current state of the application.
+     * @param action - Contains `message` and `type` for the toast.
+     */
+    showToast(state, action: PayloadAction<Omit<ToastState, 'display'>>) {
+      state.toast = {
+        ...state.toast,
+        ...action.payload,
+        display: true,
+      };
+    },
+
+    /**
+     * Action to clear the current toast notification.
+     * @param state - The current state of the application.
+     */
+    clearToast(state) {
+      state.toast = initialState.toast;
     },
   },
   selectors: {
@@ -114,7 +151,13 @@ export const appSlice = createSlice({
      * @returns The current breadcrumbs array.
      */
     getBreadcrumbs: (app: AppState) => app.breadcrumbs,
-    getSectionError: (app: AppState, errorId: string) => app.errors[errorId]
+    getSectionError: (app: AppState, errorId: string) => app.errors[errorId],
+    /**
+     * Selector to get the current toast notification.
+     * @param app - The current state of the application.
+     * @returns The current toast notification or null.
+     */
+    getToast: (app: AppState) => app.toast,
   },
 });
 
@@ -128,7 +171,9 @@ export const {
   setBreadcrumbs,
   clearBreadcrumbs,
   setError,
-  clearError
+  clearError,
+  clearToast,
+  showToast
 } = appSlice.actions;
 
 /**
@@ -137,7 +182,8 @@ export const {
 export const {
   getBreadcrumbs,
   getNotifications,
-  getSectionError
+  getSectionError,
+  getToast,
 } = appSlice.selectors;
 
 /**
