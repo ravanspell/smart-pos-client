@@ -1,10 +1,9 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { usePermissions } from '@/hooks/usePermissions';
-import { LOGIN_ROUTE } from '@/constants/routes';
 import { useLazyGetUserAuthInfoQuery } from '@/redux/api/authManagementAPI';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
@@ -20,18 +19,16 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({
     children,
     requiredPermissions = [],
-    redirectTo = LOGIN_ROUTE
 }: ProtectedRouteProps) {
-    const router = useRouter();
     const [fetchAuthInfo, { isLoading }] = useLazyGetUserAuthInfoQuery();
     const { hasAllPermissions } = usePermissions();
+    const { handleError } = useErrorHandler();
 
     const handleCheckAuthentication = async () => {
         try {
             await fetchAuthInfo().unwrap();
         } catch (error) {
-            const currentPath = window.location.pathname;
-            router.push(`${redirectTo}?returnUrl=${encodeURIComponent(currentPath)}`);
+            handleError(error, {layout: 'FULL_PAGE'});
         }
     }
 
