@@ -6,12 +6,13 @@ import { RootState } from '@/redux/store';
 import { clearError, getSectionError } from '@/redux/slices/appSlice';
 import { Button } from '@/components/atoms/Button';
 import useNetworkStatus from '@/hooks/useNetworkStatus';
+import { DEFAULT_ERROR_SECTION_ID, ERROR_TYPES } from '@/constants';
 
 interface SectionStatusBoundaryProps {
   /**
-   *  @param {string} errorId - The unique ID for the error, used to retrieve error state from Redux.
+   *  @param {string} sectionId - The unique ID for the section, used to retrieve error state from Redux.
    */
-  errorId: string;
+  sectionId: string;
   /**
    * @param {() => void} fetchMethod - The method to re-trigger the fetch operation.
    */
@@ -24,22 +25,22 @@ interface SectionStatusBoundaryProps {
 }
 
 const SectionStatusBoundary: React.FC<SectionStatusBoundaryProps> = ({
-  errorId,
+  sectionId = DEFAULT_ERROR_SECTION_ID,
   fetchMethod,
   isLoading,
   children,
 }) => {
   const dispatch = useDispatch();
-  const errorState = useSelector((state: RootState) => getSectionError(state, errorId));
+  const errorState = useSelector((state: RootState) => getSectionError(state, sectionId));
   const isOnline = useNetworkStatus();
 
   const handleRetry = async (): Promise<void> => {
-    dispatch(clearError({ sectionId: errorId }));
+    dispatch(clearError({ sectionId }));
     fetchMethod();
   };
 
   useEffect(() => {
-    if (isOnline && errorState?.type === 'network') {
+    if (isOnline && errorState?.type === ERROR_TYPES.NETWORK) {
       handleRetry();
     }
   }, [isOnline, errorState, fetchMethod]);
@@ -57,7 +58,7 @@ const SectionStatusBoundary: React.FC<SectionStatusBoundaryProps> = ({
             <>
               <p className="text-lg text-red-500 mb-4">{errorState.message || 'An error occurred.'}</p>
 
-              {(errorState.type === 'network' && !isOnline) &&
+              {(errorState.type === ERROR_TYPES.NETWORK && !isOnline) &&
                 (
                   <>
                     <p className="text-gray-700 mb-4">Please check your internet connection.</p>
