@@ -1,9 +1,10 @@
 export const AUTH = {
     LOGIN: '/auth/login',
-    AUTH_INFO: '/auth/info'
+    AUTH_INFO: '/auth/info',
+    LOGOUT: '/auth/logout'
 };
 
 export const FILE_MGT = {
-    CREATE_FODLER: '/file-management/create-folder',
+    CREATE_FOLDER: '/file-management/create-folder',
     GET_BREADCRUMBS: 'file-management/breadcrumb/'
 }

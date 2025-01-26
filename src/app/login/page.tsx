@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import LoginForm from "@/components/organisams/LoginForm";
+import LoginForm from "@/components/organisms/LoginForm";
 
 
 const LoginPage: React.FC = () => {

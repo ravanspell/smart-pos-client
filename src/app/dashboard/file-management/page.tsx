@@ -33,10 +33,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { FileOrFolder } from "@/redux/api/types/file-mgt";
 import { formatBytes, formatDate } from "@/lib/utils";
 import BreadcrumbComponent from "@/components/molecules/Breadcrumb";
-import CreateFolderModal from "@/components/organisams/CreateFolderModal";
+import CreateFolderModal from "@/components/organisms/CreateFolderModal";
 import { Icons } from "@/lib/icons";
 import FileIcon from "@/components/molecules/FileIcons";
-import FileUploadModal from "@/components/organisams/FileUploadModal";
+import FileUploadModal from "@/components/organisms/FileUploadModal";
 
 interface FileItem {
     id: string;

@@ -1,6 +1,7 @@
 'use client'
-import React, { ReactNode } from 'react';
+
 import Sidebar from './sideBar';
+import { ProtectedRoute } from '@/components/utilComponents/ProtectedRoute';
 
 interface SettingsLayoutProps {
   children: React.ReactNode;
@@ -8,18 +9,22 @@ interface SettingsLayoutProps {
 
 const SettingsLayout: React.FC<SettingsLayoutProps> = ({ children }) => {
   return (
-    <div className="flex flex-wrap">
-      {/* Sidebar */}
-      <div className="w-full lg:w-3/12 p-4 border-r">
-        <Sidebar />
-      </div>
+    <ProtectedRoute
+      requiredPermissions={['EDIT:ROLE']}
+    >
+      <div className="flex flex-wrap">
+        {/* Sidebar */}
+        <div className="w-full lg:w-3/12 p-4 border-r">
+          <Sidebar />
+        </div>
 
-      {/* Content */}
-      <div className="w-full lg:w-9/12 p-6">
-        {children}
+        {/* Content */}
+        <div className="w-full lg:w-9/12 p-6">
+            {children}
+        </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 };
 
-export default SettingsLayout;
+export default SettingsLayout; 

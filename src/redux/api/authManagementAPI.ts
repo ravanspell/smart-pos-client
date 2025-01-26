@@ -33,6 +33,12 @@ export const authManagementApi = createApi({
         body: credentials,
       }),
     }),
+    logOut: builder.query<any, void>({
+      query: () => ({
+        url: AUTH.LOGOUT,
+        method: HTTPMethod.GET,
+      })
+    }),
     getUserAuthInfo: builder.query<ScopesResponse, void>({
       query: () => ({
         url: AUTH.AUTH_INFO,
@@ -49,5 +55,7 @@ export const authManagementApi = createApi({
 
 export const {
   useLoginMutation,
-  useLazyGetUserAuthInfoQuery
+  useLazyGetUserAuthInfoQuery,
+  useGetUserAuthInfoQuery,
+  useLazyLogOutQuery,
 } = authManagementApi;

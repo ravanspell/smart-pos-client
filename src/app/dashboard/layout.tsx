@@ -1,9 +1,5 @@
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-// import Header from './header';
-// import Sidebar from './sideBar';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import type { Metadata } from 'next';
-import { Separator } from '@/components/ui/separator';
-import BreadcrumbComponent from '@/components/molecules/Breadcrumb';
 import { AppSidebar } from './app-sidebar';
 import Header from './header';
 

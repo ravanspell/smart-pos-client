@@ -11,12 +11,30 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger
 } from '@/components/atoms/DropdownMenu';
+import { LOGIN_ROUTE } from '@/constants/routes';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
+import { useLazyLogOutQuery } from '@/redux/api/authManagementAPI';
+import { useRouter } from 'next/navigation';
+
 export function UserNav() {
+  const {handleError} = useErrorHandler();
+  const [logout] = useLazyLogOutQuery();
+  const router = useRouter();
+
+  const handleLogOut = async () => {
+    try {
+      await logout().unwrap();
+      router.push(LOGIN_ROUTE);
+    } catch (error) {
+      handleError(error);
+    }
+  };
+
   const session = {
     user: {
-        image: '',
-        name: 'Ireshan pathirana',
-        email: 'ireshan@myhrm.com',
+      image: '',
+      name: 'Ireshan pathirana',
+      email: 'ireshan@myhrm.com',
     }
   }
   if (session) {
@@ -61,7 +79,7 @@ export function UserNav() {
             <DropdownMenuItem>New Team</DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => {}}>
+          <DropdownMenuItem onClick={() => handleLogOut()}>
             Log out
             <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
           </DropdownMenuItem>

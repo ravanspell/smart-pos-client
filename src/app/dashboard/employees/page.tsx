@@ -8,7 +8,7 @@ import { Checkbox } from '@/components/atoms/CheckBox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/atoms/DropdownMenu';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/atoms/Table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/atoms/Tabs';
-import CreateCandidateModal from '@/components/organisams/CreateCandidateForm';
+import CreateCandidateModal from '@/components/organisms/CreateCandidateForm';
 import { MoreVertical } from 'lucide-react';
 
 interface IAppProps {
