@@ -10,7 +10,7 @@ interface SettingsLayoutProps {
 const SettingsLayout: React.FC<SettingsLayoutProps> = ({ children }) => {
   return (
     <ProtectedRoute
-      requiredPermissions={['view:general-settings']}
+      requiredPermissions={['EDIT:ROLE']}
     >
       <div className="flex flex-wrap">
         {/* Sidebar */}
@@ -20,7 +20,7 @@ const SettingsLayout: React.FC<SettingsLayoutProps> = ({ children }) => {
 
         {/* Content */}
         <div className="w-full lg:w-9/12 p-6">
-          {children}
+            {children}
         </div>
       </div>
     </ProtectedRoute>
