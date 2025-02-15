@@ -69,7 +69,7 @@ function BreadcrumbComponent({ items }: BreadcrumbComponentProps) {
           ))}
 
         {/* Last breadcrumb item(s) */}
-        {items.length > 4 ? (
+        {items.length > 4 && (
           <>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
@@ -80,11 +80,12 @@ function BreadcrumbComponent({ items }: BreadcrumbComponentProps) {
               <BreadcrumbPage>{items[items.length - 1].label}</BreadcrumbPage>
             </BreadcrumbItem>
           </>
-        ) : (
+        )}
+        {items.length > 0 &&
           <BreadcrumbItem key={items[items.length - 1].label}>
             <BreadcrumbPage>{items[items.length - 1].label}</BreadcrumbPage>
           </BreadcrumbItem>
-        )}
+        }
       </BreadcrumbList>
     </Breadcrumb>
   )

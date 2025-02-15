@@ -32,11 +32,11 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { FileOrFolder } from "@/redux/api/types/file-mgt";
 import { formatBytes, formatDate } from "@/lib/utils";
-import BreadcrumbComponent from "@/components/molecules/Breadcrumb";
 import CreateFolderModal from "@/components/organisms/CreateFolderModal";
 import { Icons } from "@/lib/icons";
 import FileIcon from "@/components/molecules/FileIcons";
 import FileUploadModal from "@/components/organisms/FileUploadModal";
+import { useBreadcrumb } from "@/hooks/useBreadcrumb";
 
 interface FileItem {
     id: string;
@@ -56,7 +56,19 @@ const FileFolderGrid: React.FC = () => {
         data: breadcrumbs,
         error,
         isLoading
-    } = useGetBreadcrumbQuery(folderId, { skip: !folderId });
+    } = useGetBreadcrumbQuery(folderId);
+    // map the breadcrumb list items
+    const breadCrumbLinks = (breadcrumbs?.data?.parentFolderIds || []).map((breadcrumb) => ({
+        label: breadcrumb.name,
+        href: `/dashboard/file-management?folderId=${breadcrumb.id}`
+    })) as [];
+    // set the breadcrumb items into main breadcrumb component
+    useBreadcrumb([{
+        label: 'File management',
+        href: '/dashboard/file-management'
+    },
+    ...breadCrumbLinks
+    ]);
 
     const {
         data: filesAndFolders,
@@ -148,21 +160,19 @@ const FileFolderGrid: React.FC = () => {
         }
     };
 
-    const bc = (breadcrumbs?.data?.parentFolderIds || []).map((breadcrumb) => ({ label: breadcrumb.name, href: `/dashboard/file-management?folderId=${breadcrumb.id}` })) as [];
-
     return (
         <div className="p-4 relative">
             {/* Switch between grid and list view */}
             {selectedFiles.length === 0 && (
                 <div className="flex justify-between items-center mb-4">
-                    <div className="flex gap-2">
+                    {/* <div className="flex gap-2">
                         <BreadcrumbComponent
                             items={[
                                 { label: "My files", href: "/dashboard/file-management" },
                                 ...folderId ? bc : []
                             ]}
                         />
-                    </div>
+                    </div> */}
                     <div className="space-x-2">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>

@@ -3,7 +3,7 @@ import { IconEnum } from '@/lib/icons';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 
-type Breadcrumb = {
+export type Breadcrumb = {
   label: string;
   href: string;
 };
