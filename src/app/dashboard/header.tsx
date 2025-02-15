@@ -6,9 +6,11 @@ import { Notifications } from './notifications';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Separator } from '@/components/ui/separator';
 import BreadcrumbComponent from '@/components/molecules/Breadcrumb';
-import { EMPLOYEES_ROUTE } from '@/constants/routes';
+import { useSelector } from 'react-redux';
+import { getBreadcrumbs } from '@/redux/slices/appSlice';
 
 export default function Header() {
+    const breadcrumbItems = useSelector(getBreadcrumbs);
     return (
         <header className="flex shrink-0 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
             <nav className="flex items-center justify-between px-4 py-2 w-full">
@@ -16,7 +18,7 @@ export default function Header() {
                     <SidebarTrigger className="-ml-1" />
                     <Separator orientation="vertical" className="mr-2 h-4" />
                     <BreadcrumbComponent
-                        items={[{ label: 'home', href: EMPLOYEES_ROUTE }, { label: 'Dashboard', }]}
+                        items={breadcrumbItems}
                     />
                 </div>
                 <div className="flex items-center gap-2">
