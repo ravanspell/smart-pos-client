@@ -26,7 +26,7 @@ const LoginPage: React.FC = () => {
                 <div className="text-center text-sm mt-4">
                     <Link
                         className="hover:underline cursor-pointer"
-                        href={{ pathname: '/about' }}
+                        href={{ pathname: '/password-reset' }}
                     >
                         Forgot password?
                     </Link>
