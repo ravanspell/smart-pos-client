@@ -22,6 +22,10 @@ export type ScopesResponse = {
   };
 };
 
+export type ForgotPasswordRequest = {
+  email: string;
+};
+
 export const authManagementApi = createApi({
   reducerPath: 'authManagementApi',
   baseQuery: baseQuery,
@@ -50,6 +54,13 @@ export const authManagementApi = createApi({
         dispatch(setUserAuthInfo(data.data.scopes));
       },
     }),
+    forgotPassword: builder.mutation<void, ForgotPasswordRequest>({
+      query: (data) => ({
+        url: AUTH.FORGOT_PASSWORD,
+        method: HTTPMethod.POST,
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -58,4 +69,5 @@ export const {
   useLazyGetUserAuthInfoQuery,
   useGetUserAuthInfoQuery,
   useLazyLogOutQuery,
+  useForgotPasswordMutation
 } = authManagementApi;
