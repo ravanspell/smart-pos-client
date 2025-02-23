@@ -13,7 +13,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { StatusCode } from 'status-code-enum'
+import { StatusCodes } from 'http-status-codes';
 import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import {
@@ -125,7 +125,7 @@ export const useErrorHandler = () => {
                                 IconEnum.wifiOffIcon
                             );
 
-                        case StatusCode.ClientErrorUnauthorized:
+                        case StatusCodes.UNAUTHORIZED:
                             dispatch(
                                 showToast({
                                     message: 'Session expired. Please login again.',
@@ -137,7 +137,7 @@ export const useErrorHandler = () => {
                             router.push(`${LOGIN_ROUTE}?returnUrl=${encodeURIComponent(currentPath)}`);
                             break;
 
-                        case StatusCode.ClientErrorForbidden:
+                        case StatusCodes.FORBIDDEN:
                             handleErrorMessage(
                                 'You don\'t have permission to access this resource',
                                 { sectionId, layout },

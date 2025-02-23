@@ -1,5 +1,5 @@
 import { fetchBaseQuery, FetchBaseQueryError, retry } from '@reduxjs/toolkit/query/react';
-
+import { StatusCodes } from 'http-status-codes';
 /**
  * Retry condition for the RTK API
  * Skips retries for authentication errors and not found errors
@@ -8,11 +8,11 @@ import { fetchBaseQuery, FetchBaseQueryError, retry } from '@reduxjs/toolkit/que
 const retryCondition = (error: FetchBaseQueryError, _args: any) => {
     // Skip retry for authentication errors
     if ('status' in error) {
-        if (error.status === 401 || error.status === 403) {
+        if (error.status === StatusCodes.UNAUTHORIZED || error.status === StatusCodes.FORBIDDEN) {
             return false;
         }
         // Skip retry for not found
-        if (error.status === 404) {
+        if (error.status === StatusCodes.NOT_FOUND) {
             return false;
         }
     }
