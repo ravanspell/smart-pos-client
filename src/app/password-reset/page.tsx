@@ -9,10 +9,13 @@ import { Input } from "@/components/atoms/Input";
 import { SubmitButton } from "@/components/molecules/SubmitButton";
 import { useForgotPasswordMutation } from "@/redux/api/authManagementAPI";
 import { useState } from "react";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/atoms/Form";
+import { Form } from "@/components/atoms/Form";
+import { CustomFormField } from "@/components/molecules/FormField";
 
 const resetPasswordSchema = z.object({
-  email: z.string().email({ message: "Invalid email address" }),
+  email: z.string()
+    .min(1, { message: "Email is required" })
+    .email({ message: "Invalid email address" })
 });
 
 type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
@@ -26,6 +29,9 @@ export default function PasswordResetPage({
 
   const form = useForm<ResetPasswordFormValues>({
     resolver: zodResolver(resetPasswordSchema),
+    defaultValues: {
+      email: "",
+    },
   });
   // 
   const onSubmit = async (data: ResetPasswordFormValues) => {
@@ -56,19 +62,12 @@ export default function PasswordResetPage({
                   className="space-y-4"
                 >
                   {/* Email Field */}
-                  <FormField
+                  <CustomFormField
                     name="email"
-                    control={form.control}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter email" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                    label='Email'
+                  >
+                    <Input placeholder="Enter email" />
+                  </CustomFormField>
                   <SubmitButton
                     className="w-full"
                     label="Send password reset email"
