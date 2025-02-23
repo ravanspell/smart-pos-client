@@ -5,7 +5,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
+} from "@/components/atoms/Breadcrumb"
 import {
   DropdownMenu,
   DropdownMenuContent,
