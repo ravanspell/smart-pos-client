@@ -5,13 +5,13 @@ import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
 import { PanelLeft } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
-import { Sheet, SheetContent } from "@/components/ui/sheet"
+import { Sheet, SheetContent } from "@/components/atoms/Sheet"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip"
+} from "@/components/atoms/ToolTip"
 import { cn } from "@/lib/utils"
 import { useIsMobile } from "@/hooks/useIsMobile"
 import { Button } from "@/components/atoms/Button"
