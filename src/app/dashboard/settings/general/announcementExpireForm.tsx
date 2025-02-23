@@ -4,8 +4,8 @@ import { z } from 'zod';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormField, FormItem, FormLabel, FormControl } from '@/components/atoms/Form';
-import { Input } from '@/components/ui/input';
 import { SubmitButton } from '@/components/molecules/SubmitButton';
+import { Input } from '@/components/atoms/Input';
 
 const schema = z.object({
     expireDays: z.number().min(1, 'Expire days must be at least 1').max(3650, 'Maximum 3650 days allowed'),
