@@ -4,8 +4,9 @@ import { z } from 'zod';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormField, FormItem, FormLabel, FormControl } from '@/components/atoms/Form';
-import { Input } from '@/components/ui/input';
 import { SubmitButton } from '@/components/molecules/SubmitButton';
+import { Input } from '@/components/atoms/Input';
+import { CustomFormField } from '@/components/molecules/FormField';
 
 const schema = z.object({
     expireDays: z.number().min(1, 'Expire days must be at least 1').max(3650, 'Maximum 3650 days allowed'),
@@ -38,6 +39,12 @@ export const AnnouncementExpireForm: React.FC = () => {
                         </FormItem>
                     )}
                 />
+                <CustomFormField
+                    name="expireDays"
+                    label='Default Expire Days'
+                >
+                    <Input type="number" />
+                </CustomFormField>
                 <SubmitButton
                     label='Save Changes'
                     type="submit"

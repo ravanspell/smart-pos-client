@@ -5,7 +5,7 @@ import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+} from "@/components/atoms/Collapsible"
 import {
     SidebarGroup,
     SidebarMenu,
@@ -14,7 +14,7 @@ import {
     SidebarMenuSub,
     SidebarMenuSubButton,
     SidebarMenuSubItem,
-} from "@/components/ui/sidebar"
+} from "@/components/molecules/SideBar"
 import Link from "next/link"
 
 interface SideBarMenuItem {

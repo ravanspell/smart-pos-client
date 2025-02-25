@@ -1,4 +1,4 @@
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarInset, SidebarProvider } from '@/components/molecules/SideBar';
 import type { Metadata } from 'next';
 import { AppSidebar } from './app-sidebar';
 import Header from './header';

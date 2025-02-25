@@ -1,4 +1,24 @@
-import { fetchBaseQuery, retry } from '@reduxjs/toolkit/query/react';
+import { fetchBaseQuery, FetchBaseQueryError, retry } from '@reduxjs/toolkit/query/react';
+import { StatusCodes } from 'http-status-codes';
+/**
+ * Retry condition for the RTK API
+ * Skips retries for authentication errors and not found errors
+ * Retries other errors (network issues, 500s, etc.)
+ */
+const retryCondition = (error: FetchBaseQueryError, _args: any) => {
+    // Skip retry for authentication errors
+    if ('status' in error) {
+        if (error.status === StatusCodes.UNAUTHORIZED || error.status === StatusCodes.FORBIDDEN) {
+            return false;
+        }
+        // Skip retry for not found
+        if (error.status === StatusCodes.NOT_FOUND) {
+            return false;
+        }
+    }
+    // Retry other errors (network issues, 500s, etc.)
+    return true;
+}
 
 /**
  * Global setup of the redux toolkit RTK API
@@ -12,5 +32,6 @@ export const baseQuery = retry(fetchBaseQuery({
         'Access-Control-Allow-Credentials': 'true'
     },
 }), {
-    maxRetries: 5, // default 5
+    retryCondition: retryCondition as any,
+    maxRetries: 5 // default 5
 });

@@ -15,7 +15,7 @@ import {
     SidebarContent,
     SidebarHeader,
     SidebarRail,
-} from "@/components/ui/sidebar"
+} from "@/components/molecules/SideBar"
 import { Separator } from "@/components/ui/separator"
 import {
     DASHBOARD_ROUTE,
