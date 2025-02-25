@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useLazyGetUserAuthInfoQuery } from '@/redux/api/authManagementAPI';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
+import { ERROR_LAYOUT_TYPES } from '@/constants';
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
@@ -28,7 +29,7 @@ export function ProtectedRoute({
         try {
             await fetchAuthInfo().unwrap();
         } catch (error) {
-            handleError(error, {layout: 'FULL_PAGE'});
+            handleError(error, {layout: ERROR_LAYOUT_TYPES.FULL_PAGE});
         }
     }
 
