@@ -112,12 +112,11 @@ export default function RolesTable() {
         // Implement your delete logic here
         // Could call a mutation from RTK Query
     }
-
     // Calculate if we have selected items
     const hasSelected = Object.keys(rowSelection).length > 0
-    console.log('item count', pagination)
+
     return (
-        <div className="container mx-auto py-10">
+        <div className="mx-auto">
             <h1 className="text-2xl font-bold mb-4">Roles Management</h1>
             <div className="flex items-center justify-end mb-2">
                 {hasSelected && (
