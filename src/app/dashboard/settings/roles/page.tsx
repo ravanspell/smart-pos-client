@@ -19,7 +19,11 @@ import { SortableColumnHeader } from "@/components/molecules/SortableColumnHeade
 import { DataTable } from "@/components/molecules/DataTable/DataTable"
 import { Role } from "@/types/roles"
 import { useGetRolesQuery } from "@/redux/api/rolesAPI"
-import { useMemo, useState } from "react"
+import { lazy, useMemo, useState } from "react"
+import { PlusIcon } from "@radix-ui/react-icons"
+import Modal from "@/components/molecules/Modal"
+
+const CreateRoleForm = lazy(() => import("./CreateRoleForm"))
 
 // Define columns for Role data
 export const roleColumns: ColumnDef<Role>[] = [
@@ -69,6 +73,7 @@ export const roleColumns: ColumnDef<Role>[] = [
 
 export default function RolesTable() {
     // Set up state for the table
+    const [isAddingRole, setIsAddingRole] = useState(false);
     const [sorting, setSorting] = useState<SortingState>([
         { id: "name", desc: false },
     ])
@@ -127,6 +132,11 @@ export default function RolesTable() {
                         Delete Selected
                     </Button>
                 )}
+                <Button
+                    onClick={() => setIsAddingRole(true)}
+                >
+                    <PlusIcon className="w-4 h-4" /> Add Role
+                </Button>
             </div>
             <DataTable
                 columns={roleColumns}
@@ -141,6 +151,20 @@ export default function RolesTable() {
                 onSortingChange={setSorting}
                 enableRowSelection
             />
+            {isAddingRole &&
+                <Modal
+                    isOpen={isAddingRole}
+                    onClose={() => setIsAddingRole(false)}
+                    title="Add Role"
+                    description="Add a new role to the system"
+                    isLoading={false}
+                >
+                    <CreateRoleForm
+                        onClose={() => setIsAddingRole(false)}
+                    />
+                </Modal>
+            }
         </div>
+
     )
 }
