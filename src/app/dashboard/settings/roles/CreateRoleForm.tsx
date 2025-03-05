@@ -3,7 +3,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import * as z from "zod";
 import { Input } from "@/components/atoms/Input";
 import { CustomFormField } from "@/components/molecules/FormField";
-import { Textarea } from "@/components/ui/textarea";
+import { Textarea } from "@/components/atoms/TextArea";
 import ModalActionButtons from "@/components/molecules/ModalActionButtons";
 
 
