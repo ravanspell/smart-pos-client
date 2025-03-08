@@ -16,6 +16,7 @@ import { useLoginMutation, UserCredentials } from '@/redux/api/authManagementAPI
 import { Input } from '@/components/atoms/Input';
 import { fetchToken } from '@/lib/firebaseClient';
 import { DASHBOARD_ROUTE } from '@/constants/routes';
+import Turnstile from '@/components/Turnstile';
 
 // Define Zod schema for validation
 const loginSchema = z.object({
@@ -27,6 +28,8 @@ const loginSchema = z.object({
 type LoginFormInputs = z.infer<typeof loginSchema>;
 
 const LoginFormComponent: React.FC = () => {
+    const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+
     const [login] = useLoginMutation();
     const [isLoginInProgress, setIsLoginInProgress] = useState(false);
     const router = useRouter();
@@ -39,6 +42,15 @@ const LoginFormComponent: React.FC = () => {
             password: '',
         },
     });
+
+    /**
+     * Handle the turnstile token verification.
+     * 
+     * @param token - The turnstile token.
+     */
+    const handleTurnstileVerify = (token: string) => {
+        setTurnstileToken(token);
+    }
 
     const getNotificationPermissionAndToken = async () => {
         // Step 1: Check if Notifications are supported in the browser.
@@ -65,6 +77,7 @@ const LoginFormComponent: React.FC = () => {
             const fcmToken = await getNotificationPermissionAndToken();
             const loginData: UserCredentials = {
                 ...data,
+                turnstileToken: turnstileToken ?? '',
             }
             if (fcmToken) {
                 loginData.notificationToken = fcmToken;
@@ -112,11 +125,15 @@ const LoginFormComponent: React.FC = () => {
                                 <FormMessage />
                             </FormItem>
                         )} />
+                    {/* Turnstile for captcha verification */}
+                    <Turnstile onVerify={handleTurnstileVerify} />
                     {/* Submit Button */}
                     <SubmitButton
                         label="Login"
                         isLoading={isLoginInProgress}
-                        className="w-full mt-4" />
+                        className="w-full mt-4"
+                        disabled={!turnstileToken}
+                    />
                 </form>
             </Form>
         </>

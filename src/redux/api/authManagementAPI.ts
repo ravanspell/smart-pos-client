@@ -8,6 +8,7 @@ export type UserCredentials = {
   email: string;
   password: string;
   notificationToken?: string;
+  turnstileToken: string;
 };
 
 export type User = {
