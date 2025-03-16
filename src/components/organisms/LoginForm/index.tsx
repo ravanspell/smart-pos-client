@@ -132,7 +132,8 @@ const LoginFormComponent: React.FC = () => {
                         label="Login"
                         isLoading={isLoginInProgress}
                         className="w-full mt-4"
-                        disabled={!turnstileToken}
+                        // TODO: Uncomment this when the turnstile token needed for login
+                        // disabled={!turnstileToken}
                     />
                 </form>
             </Form>
