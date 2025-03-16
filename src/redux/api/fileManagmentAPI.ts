@@ -3,6 +3,9 @@ import { baseQuery } from './api';
 import { HTTPMethod } from 'http-method-enum';
 import { ApiResponse, FileOrFolder, GetFolderContentsResponse } from './types/file-mgt';
 
+interface PresignedUrlResponse {
+    uploadUrl: string;
+}
 
 export interface BreadcrumbResponse {
     parentFolderIds: {
@@ -130,6 +133,18 @@ export const fileManagementApi = createApi({
             transformResponse: (response: ApiResponse<BreadcrumbResponse>) => response,
             // providesTags: (result, error, folderId) => [{ type: 'Breadcrumb', id: folderId }],
         }),
+        // **Get Presigned URL**
+        getPresignedUrl: builder.mutation<
+            ApiResponse<PresignedUrlResponse>,
+            { fileName: string }
+        >({
+            query: ({ fileName }) => ({
+                url: 'file-management/upload/init',
+                method: HTTPMethod.POST,
+                body: { fileName },
+            }),
+            transformResponse: (response: ApiResponse<PresignedUrlResponse>) => response,
+        }),
     }),
 });
 
@@ -139,4 +154,5 @@ export const {
     useRenameFolderMutation,
     useRenameFileMutation,
     useGetBreadcrumbQuery,
+    useGetPresignedUrlMutation,
 } = fileManagementApi;
