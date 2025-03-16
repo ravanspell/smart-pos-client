@@ -1,89 +1,31 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Button } from "@/components/atoms/Button";
 import { Progress } from "@/components/atoms/Progress";
 import { Icons } from "@/lib/icons";
 import { formatBytes } from "@/lib/utils";
+import { useUpload } from "@/hooks/useUpload";
 
 interface FileCardProps {
-    file: File
-    onRemove: () => void
+    file: File;
+    onRemove: () => void;
 }
 
-const UPLOAD_COMPLATED = 100; // 100%
+const UPLOAD_COMPLETED = 100; // 100%
 
 function FileCard({ file, onRemove }: FileCardProps) {
-    const [uploadPercentage, setUploadPercentage] = useState(0);
-
-    const getPresignedUrl = async (file: File) => {
-        try {
-            const response = await fetch('http://localhost:3001/api/file-management/upload/init', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    fileName: file.name,
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to get pre-signed URL mmmm');
-            }
-
-            const { data } = await response.json();
-            console.log("response--->", data);
-            return data.uploadUrl;
-        } catch (error) {
-            console.error("the error--->", error);
-            return null;
-        }
-    };
-
-    const uploadFile = (file: File, url: string) => {
-        return new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.open('PUT', url, true);
-            xhr.setRequestHeader('Content-Type', file.type);
-
-            xhr.upload.onprogress = (event) => {
-                if (event.lengthComputable) {
-                    const percentCompleted = Math.round((event.loaded * 100) / event.total);
-                    setUploadPercentage(percentCompleted);
-                }
-            };
-
-            xhr.onload = () => {
-                if (xhr.status === 200) {
-                    resolve('File uploaded successfully');
-                } else {
-                    reject('Error uploading file');
-                }
-            };
-
-            xhr.onerror = () => reject('Error uploading file');
-            xhr.send(file);
-        });
-    };
-
-    const handleFileInput = async (file: File) => {
-        if (!file) return;
-        try {
-            // Step 1: Get pre-signed URL from backend
-            const url = await getPresignedUrl(file);
-            if (!url) {
-                alert('Could not get pre-signed URL');
-                return;
-            }
-            // Step 2: Upload the file
-            await uploadFile(file, url);
-        } catch (err) {
-            console.error('Error uploading file:', err);
-        }
-    };
+    const { uploadFile, progress, isUploading, error } = useUpload({
+        onError: (error) => {
+            console.error('Upload error:', error);
+        },
+        onSuccess: () => {
+            // Handle successful upload
+            console.log('Upload completed successfully');
+        },
+    });
 
     useEffect(() => {
-        handleFileInput(file)
-    }, []);
+        uploadFile(file).catch(console.error);
+    }, [file]);
 
     return (
         <div className="relative flex items-center gap-2.5">
@@ -97,9 +39,14 @@ function FileCard({ file, onRemove }: FileCardProps) {
                             {formatBytes(file.size)}
                         </p>
                     </div>
-                    {(uploadPercentage
-                        && (uploadPercentage !== UPLOAD_COMPLATED))
-                        && <Progress className="h-1" value={uploadPercentage} />}
+                    {isUploading && progress !== UPLOAD_COMPLETED && (
+                        <Progress className="h-1" value={progress} />
+                    )}
+                    {error && (
+                        <p className="text-xs text-destructive">
+                            Upload failed: {error.message}
+                        </p>
+                    )}
                 </div>
             </div>
             <div className="flex items-center gap-2">
@@ -109,13 +56,14 @@ function FileCard({ file, onRemove }: FileCardProps) {
                     size="icon"
                     className="size-7"
                     onClick={onRemove}
+                    disabled={isUploading}
                 >
                     <Icons.close className="size-4" aria-hidden="true" />
                     <span className="sr-only">Remove file</span>
                 </Button>
             </div>
         </div>
-    )
+    );
 }
 
 export default FileCard;
