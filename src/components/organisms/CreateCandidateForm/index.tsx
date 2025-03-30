@@ -1,4 +1,5 @@
-// components/CreateCandidateModal.tsx
+"use client";
+
 import React, { useEffect, useState } from 'react';
 import {
     Form,
@@ -8,10 +9,9 @@ import {
     FormLabel,
     FormMessage
 } from '@/components/atoms/Form';
-import { useForm, SubmitHandler, ControllerRenderProps } from 'react-hook-form';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-// import { useCreateCandidateMutation } from '../store/candidateSlice';
 import FormSelectDropdown from '@/components/molecules/FormSelectDropdown';
 import { Input } from '@/components/atoms/Input';
 import { Button } from '@/components/atoms/Button';
