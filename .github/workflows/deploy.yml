@@ -1,12 +1,17 @@
-name: Deploy Next.js to S3 and CloudFront
+name: Deploy myhrm application
 
 on:
   push:
     branches:
       - main
 
+# Add concurrency to prevent multiple deployments running simultaneously
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
-  AWS_REGION: ${{ vars.AWS_REGION }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
   S3_BUCKET: ${{ vars.S3_BUCKET }}
   CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
   NODE_VERSION: '18'
@@ -38,6 +43,14 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_DATABASE_URL: ${{ vars.NEXT_PUBLIC_FIREBASE_DATABASE_URL }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ vars.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID }}
+          NEXT_PUBLIC_FIREBASE_FCM_VAPID_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_FCM_VAPID_KEY }}
           NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
 
       - name: Configure AWS credentials
@@ -45,28 +58,51 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Deploy to S3
         run: |
-          aws s3 sync ./out s3://${{ env.S3_BUCKET }} \
+          if ! aws s3 sync ./out s3://${{ env.S3_BUCKET }} \
             --delete \
             --cache-control "public, max-age=31536000, immutable" \
             --exclude "*.html" \
-            --exclude "_next/data/*"
-
-          # Deploy HTML and Next.js data files with different cache settings
-          aws s3 sync ./out s3://${{ env.S3_BUCKET }} \
+            --exclude "_next/data/*"; then
+            echo "Failed to sync static assets to S3"
+            exit 1
+          fi
+  
+          if ! aws s3 sync ./out s3://${{ env.S3_BUCKET }} \
             --delete \
             --cache-control "public, max-age=0, must-revalidate" \
             --include "*.html" \
-            --include "_next/data/*"
+            --include "_next/data/*"; then
+            echo "Failed to sync HTML and data files to S3"
+            exit 1
+          fi
 
       - name: Invalidate CloudFront cache
-        run: |
-          aws cloudfront create-invalidation \
-            --distribution-id ${{ env.CLOUDFRONT_DISTRIBUTION_ID }} \
-            --paths "/*"
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const maxRetries = 3;
+            const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+                
+            for (let i = 0; i < maxRetries; i++) {
+              try {
+                await exec.exec('aws', [
+                  'cloudfront',
+                  'create-invalidation',
+                  '--distribution-id',
+                  process.env.CLOUDFRONT_DISTRIBUTION_ID,
+                  '--paths',
+                      '/*'
+                    ]);
+                    break;
+                  } catch (error) {
+                    if (i === maxRetries - 1) throw error;
+                    await sleep(5000); // Wait 5 seconds before retry
+                  }
+                }
 
       - name: Deployment status notification
         if: always()
@@ -75,11 +111,25 @@ jobs:
           script: |
             const { status, conclusion } = context.job
             const deployStatus = status === 'completed' && conclusion === 'success' ? '✅ Success' : '❌ Failed'
-            const message = `Deployment ${deployStatus}\nEnvironment: Production\nBranch: ${context.ref}`
-            
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: message
-            }) 
+            const environment = 'Production'
+            const branch = context.ref
+            const sha = context.sha.substring(0, 7)
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+                
+            const message = `
+            ## Deployment Status: ${deployStatus}
+            - **Environment:** ${environment}
+            - **Branch:** ${branch}
+            - **Commit:** ${sha}
+            - **Workflow:** [View Details](${runUrl})
+                
+            ${conclusion !== 'success' ? '⚠️ Check workflow logs for details' : ''}
+            `
+            if (context.issue.number) {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: message
+              })
+            }
