@@ -18,14 +18,13 @@ import { Button } from '@/components/atoms/Button';
 import { SubmitButton } from '@/components/molecules/SubmitButton';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/atoms/Dialog';
 
-type CandidateForm = z.infer<typeof candidateSchema>;
-
 interface Country {
     name: string;
     code: string;
 }
 
-const candidateSchema = z.object({
+// Base schema without File validation
+const baseSchema = {
     firstName: z
         .string()
         .min(3, 'First name must be at least 3 characters')
@@ -52,13 +51,20 @@ const candidateSchema = z.object({
         .string()
         .min(10, 'Address must be at least 10 characters')
         .max(255, 'Address must be at most 255 characters'),
-    resume: z
-        .instanceof(File)
-        .refine((file) => file.size > 0, {
-            message: 'Resume is required',
-        }),
     country: z.string().min(1, 'Country is required'),
+};
+
+// Function to create the full schema with File validation
+const createCandidateSchema = () => z.object({
+    ...baseSchema,
+    resume: z.custom<File>((file) => file instanceof File, {
+        message: 'Resume is required',
+    }).refine((file) => file instanceof File && file.size > 0, {
+        message: 'Resume is required',
+    }),
 });
+
+type CandidateForm = z.infer<ReturnType<typeof createCandidateSchema>>;
 
 const CreateCandidateModal: React.FC = () => {
     const [open, setOpen] = useState<boolean>(false);
@@ -68,7 +74,7 @@ const CreateCandidateModal: React.FC = () => {
     // const [createCandidate, { isLoading, isSuccess, isError, error }] = useCreateCandidateMutation();
 
     const form = useForm<CandidateForm>({
-        resolver: zodResolver(candidateSchema),
+        resolver: zodResolver(createCandidateSchema()),
         defaultValues: {
             country: '',
         },
