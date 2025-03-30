@@ -11,11 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/atoms/Tab
 import CreateCandidateModal from '@/components/organisms/CreateCandidateForm';
 import { MoreVertical } from 'lucide-react';
 
-interface IAppProps {
-  test: string;
-}
 
-const EmployeesPage: React.FC<IAppProps> = (props) => {
+const EmployeesPage: React.FC<any> = () => {
   return (
     <>
       <div className="container mx-auto">

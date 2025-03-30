@@ -2,7 +2,7 @@ import {
     Folder,
     FileText,
     FileSpreadsheet,
-    Image,
+    Image as LucideImage,
     FileVideo,
     FileX,
     File
@@ -25,7 +25,9 @@ const getIconByExtension = (extension: string) => {
         case 'jpg':
         case 'jpeg':
         case 'png':
-            return <Image className="text-yellow-600" />;
+            // eslint-disable-next-line jsx-a11y/alt-text
+            // this not an image, it's a file icon
+            return <LucideImage className="text-yellow-600" />;
         // case 'ppt':
         // case 'pptx':
         //   return <FilePpt className="text-orange-600" />;

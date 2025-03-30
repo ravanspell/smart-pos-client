@@ -110,7 +110,7 @@ const FileFolderGrid: React.FC = () => {
             console.log("log --->", ids);
 
             const link = document.createElement('a');
-            link.href = `http://localhost:3001/api/file-management/download?ids=${ids.join(',')}`;
+            link.href = `${process.env.NEXT_PUBLIC_API_URL}/api/file-management/download?ids=${ids.join(',')}`;
             link.style.display = 'none';
             // Set the target to _blank to avoid navigating away from the current page
             link.setAttribute('target', '_blank');
@@ -122,11 +122,7 @@ const FileFolderGrid: React.FC = () => {
         }
     };
 
-    const handleDelete = (item) => {
-        // setFiles((prev) => prev.filter((file) => file.id !== item.id));
-    };
-
-    const handleRename = (item) => {
+    const handleRename = (item: FileItem) => {
         const newName = prompt(`Rename ${item.name} to:`, item.name);
         if (newName) {
             setFiles((prev) =>

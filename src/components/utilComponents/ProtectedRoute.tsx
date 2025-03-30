@@ -49,7 +49,7 @@ export function ProtectedRoute({
     if (requiredPermissions.length > 0 && !hasAllPermissions(requiredPermissions)) {
         return (
             <div>
-                You don't have the required permissions to access this page
+                You don&apos;t have the required permissions to access this page
             </div>
         );
     }

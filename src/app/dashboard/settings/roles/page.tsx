@@ -6,8 +6,14 @@ import {
     RowSelectionState,
     SortingState
 } from "@tanstack/react-table"
-import { MoreHorizontal } from "lucide-react"
 import { Button } from "@/components/atoms/Button"
+import { DataTable } from "@/components/molecules/DataTable/DataTable"
+import { useGetRolesQuery } from "@/redux/api/rolesAPI"
+import { lazy, useMemo, useState } from "react"
+import { PlusIcon } from "@radix-ui/react-icons"
+import { MoreHorizontal } from "lucide-react"
+import Modal from "@/components/molecules/Modal"
+import { Role } from "@/types/roles"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -16,60 +22,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/atoms/DropdownMenu"
 import { SortableColumnHeader } from "@/components/molecules/SortableColumnHeader"
-import { DataTable } from "@/components/molecules/DataTable/DataTable"
-import { Role } from "@/types/roles"
-import { useGetRolesQuery } from "@/redux/api/rolesAPI"
-import { lazy, useMemo, useState } from "react"
-import { PlusIcon } from "@radix-ui/react-icons"
-import Modal from "@/components/molecules/Modal"
 
 const CreateRoleForm = lazy(() => import("./CreateRoleForm"))
-
-// Define columns for Role data
-export const roleColumns: ColumnDef<Role>[] = [
-    {
-        accessorKey: "name",
-        header: ({ column }) => (
-            <SortableColumnHeader column={column} title="Role Name" />
-        ),
-        cell: ({ row }) => <div className="font-medium">{row.getValue("name")}</div>,
-    },
-    {
-        accessorKey: "description",
-        header: ({ column }) => (
-            <SortableColumnHeader column={column} title="Description" />
-        ),
-        cell: ({ row }) => <div>{row.getValue("description")}</div>,
-    },
-    {
-        id: "actions",
-        enableHiding: false,
-        cell: ({ row }) => {
-            const role = row.original
-            // TODO: add actions for the role
-            return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(role.id)}
-                        >
-                            Copy role ID
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>Edit role</DropdownMenuItem>
-                        <DropdownMenuItem>Delete role</DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            )
-        },
-    },
-]
 
 export default function RolesTable() {
     // Set up state for the table
@@ -82,6 +36,55 @@ export default function RolesTable() {
         pageSize: 10,
     })
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+
+    // Define columns for Role data
+    const columns = useMemo<ColumnDef<Role>[]>(() => [
+        {
+            accessorKey: "name",
+            header: ({ column }) => (
+                <SortableColumnHeader column={column} title="Role Name" />
+            ),
+            cell: ({ row }) => <div className="font-medium">{row.getValue("name")}</div>,
+        },
+        {
+            accessorKey: "description",
+            header: ({ column }) => (
+                <SortableColumnHeader column={column} title="Description" />
+            ),
+            cell: ({ row }) => <div>{row.getValue("description")}</div>,
+        },
+        {
+            id: "actions",
+            enableHiding: false,
+            cell: ({ row }) => {
+                const role = row.original
+                const copyToClipboard = () => {
+                    if (typeof window !== 'undefined') {
+                        navigator.clipboard.writeText(role.id)
+                    }
+                }
+                
+                return (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={copyToClipboard}>
+                                Copy role ID
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem>Edit role</DropdownMenuItem>
+                            <DropdownMenuItem>Delete role</DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                )
+            },
+        },
+    ], [])
 
     // Extract query parameters from the table state
     const queryParams = useMemo(() => {
@@ -139,7 +142,7 @@ export default function RolesTable() {
                 </Button>
             </div>
             <DataTable
-                columns={roleColumns}
+                columns={columns}
                 data={data?.items || []}
                 loading={isLoading}
                 totalCount={data?.meta?.totalItems || 0}
@@ -165,6 +168,5 @@ export default function RolesTable() {
                 </Modal>
             }
         </div>
-
     )
 }

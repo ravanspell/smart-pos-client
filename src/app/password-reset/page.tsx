@@ -20,10 +20,10 @@ const resetPasswordSchema = z.object({
 
 type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
 
-export default function PasswordResetPage({
+const PasswordResetPage: React.FC<any> = ({
   className,
   ...props
-}: React.ComponentPropsWithoutRef<"div">) {
+}) => {
   const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -52,7 +52,7 @@ export default function PasswordResetPage({
             <CardHeader className="text-center">
               <CardTitle className="text-xl">Reset your password</CardTitle>
               <CardDescription>
-                Enter your user account's verified email address and we will send you a password reset link.
+                Enter your user account&#39;s verified email address and we will send you a password reset link.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -82,3 +82,5 @@ export default function PasswordResetPage({
     </div>
   )
 }
+
+export default PasswordResetPage;

@@ -73,6 +73,7 @@
     "@types/react-dom": "^18.2.18",
     "autoprefixer": "^10.4.20",
     "eslint": "^8.57.1",
+    "eslint-config-next": "^15.2.4",
     "eslint-plugin-storybook": "^0.8.0",
     "postcss": "^8.4.41",
     "storybook": "^8.2.9",

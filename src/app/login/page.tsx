@@ -19,9 +19,6 @@ const LoginPage: React.FC = () => {
                 <h2 className="text-xl sm:text-2xl font-bold text-gray-800 text-center mb-2">Sign In</h2>
                 <p className="text-gray-600 text-center mb-6">Please login to access the dashboard.</p>
                 <LoginForm />
-                <p className="text-center text-sm text-gray-600 mt-6">
-                    Note: You can use the username 'admin' and password 'admin' to log in.
-                </p>
                 {/* Forgot Password Link */}
                 <div className="text-center text-sm mt-4">
                     <Link
