@@ -2,6 +2,7 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQuery } from './api';
 import { HTTPMethod } from 'http-method-enum';
 import { ApiResponse, FileOrFolder, GetFolderContentsResponse } from './types/file-mgt';
+import { FILE_MGT } from '@/constants/api';
 
 interface PresignedUrlResponse {
     uploadUrl: string;
@@ -129,7 +130,7 @@ export const fileManagementApi = createApi({
         }),
         // **Get Breadcrumb**
         getBreadcrumb: builder.query<ApiResponse<BreadcrumbResponse>, string>({
-            query: (folderId): string => `file-management/breadcrumb/${folderId}`,
+            query: (folderId): string => `${FILE_MGT.GET_BREADCRUMBS}${folderId}`,
             transformResponse: (response: ApiResponse<BreadcrumbResponse>) => response,
             // providesTags: (result, error, folderId) => [{ type: 'Breadcrumb', id: folderId }],
         }),
@@ -139,7 +140,7 @@ export const fileManagementApi = createApi({
             { fileName: string }
         >({
             query: ({ fileName }) => ({
-                url: 'file-management/upload/init',
+                url: FILE_MGT.INITIATE_UPLOAD,
                 method: HTTPMethod.POST,
                 body: { fileName },
             }),

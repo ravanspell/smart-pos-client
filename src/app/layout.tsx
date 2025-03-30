@@ -1,6 +1,6 @@
 "use client"
 
-import { type ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { StoreProvider } from "../StoreProvider";
 import { Toaster } from "../components/atoms/Toast";
 import NextTopLoader from 'nextjs-toploader';
@@ -36,7 +36,10 @@ export default function RootLayout({ children }: Props) {
           <NextTopLoader showSpinner={false} />
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <Toaster />
-            {children}
+            {/* Suspense is used to load the page content lazily */}
+            <Suspense fallback={<div>Loading...</div>}>
+              {children}
+            </Suspense>
             <TailwindIndicator />
           </ThemeProvider>
         </body>
