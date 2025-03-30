@@ -25,10 +25,10 @@ const retryCondition = (error: FetchBaseQueryError, _args: any) => {
  * Setup provides retries with a basic exponential backoff.
  */
 export const baseQuery = retry(fetchBaseQuery({
-    baseUrl: 'http://localhost:3001/api/',
+    baseUrl: `${process.env.NEXT_PUBLIC_API_URL}/api/`,
     credentials: 'include',
     headers: {
-        'Access-Control-Allow-Origin': 'http://localhost:3000',
+        'Access-Control-Allow-Origin': `${process.env.NEXT_PUBLIC_API_URL}`,
         'Access-Control-Allow-Credentials': 'true'
     },
 }), {
