@@ -28,7 +28,7 @@ export const baseQuery = retry(fetchBaseQuery({
     baseUrl: `${process.env.NEXT_PUBLIC_API_URL}/api/`,
     credentials: 'include',
     headers: {
-        'Access-Control-Allow-Origin': `${process.env.NEXT_PUBLIC_API_URL}`,
+        'Access-Control-Allow-Origin': `${process.env.NEXT_PUBLIC_ALLOWED_ORIGIN}`,
         'Access-Control-Allow-Credentials': 'true'
     },
 }), {
