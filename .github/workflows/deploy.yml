@@ -88,24 +88,65 @@ jobs:
         with:
           script: |
             const maxRetries = 3;
+            const baseDelay = 5000; // 5 seconds base delay
+            
             const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-                
+            
             for (let i = 0; i < maxRetries; i++) {
               try {
-                await exec.exec('aws', [
+                console.log(`Attempting CloudFront cache invalidation (attempt ${i + 1}/${maxRetries})...`);
+                
+                const { stdout } = await exec.exec('aws', [
                   'cloudfront',
                   'create-invalidation',
                   '--distribution-id',
-                  process.env.CLOUDFRONT_DISTRIBUTION_ID,
+                  ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }},
                   '--paths',
-                      '/*'
-                    ]);
+                  '/*'
+                ]);
+                
+                console.log('CloudFront invalidation initiated successfully');
+                console.log(stdout);
+                
+                // Wait for the invalidation to complete
+                const invalidationId = JSON.parse(stdout).Invalidation.Id;
+                console.log(`Waiting for invalidation ${invalidationId} to complete...`);
+                
+                while (true) {
+                  const { stdout: statusOutput } = await exec.exec('aws', [
+                    'cloudfront',
+                    'get-invalidation',
+                    '--distribution-id',
+                    ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }},
+                    '--id',
+                    invalidationId
+                  ]);
+                  
+                  const status = JSON.parse(statusOutput).Invalidation.Status;
+                  
+                  if (status === 'Completed') {
+                    console.log('CloudFront cache invalidation completed successfully');
                     break;
-                  } catch (error) {
-                    if (i === maxRetries - 1) throw error;
-                    await sleep(5000); // Wait 5 seconds before retry
+                  } else if (status === 'Failed') {
+                    throw new Error('CloudFront cache invalidation failed');
                   }
+                  
+                  await sleep(10000); // Check status every 10 seconds
                 }
+                
+                break;
+              } catch (error) {
+                console.error(`Attempt ${i + 1} failed:`, error.message);
+                
+                if (i === maxRetries - 1) {
+                  throw new Error(`Failed to invalidate CloudFront cache after ${maxRetries} attempts: ${error.message}`);
+                }
+                
+                const delay = baseDelay * Math.pow(2, i); // Exponential backoff
+                console.log(`Waiting ${delay/1000} seconds before retry...`);
+                await sleep(delay);
+              }
+            }
 
       - name: Deployment status notification
         if: always()
