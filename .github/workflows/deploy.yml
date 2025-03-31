@@ -16,7 +16,7 @@ concurrency:
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   S3_BUCKET: ${{ vars.S3_BUCKET }}
-  CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
+  CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
   NODE_VERSION: '18'
 
 jobs:
@@ -100,7 +100,7 @@ jobs:
                   'cloudfront',
                   'create-invalidation',
                   '--distribution-id',
-                  ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }},
+                  ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }},
                   '--paths',
                   '/*'
                 ]);
@@ -117,7 +117,7 @@ jobs:
                     'cloudfront',
                     'get-invalidation',
                     '--distribution-id',
-                    ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }},
+                    ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }},
                     '--id',
                     invalidationId
                   ]);
