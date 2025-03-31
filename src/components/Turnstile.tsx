@@ -67,7 +67,7 @@ const Turnstile: React.FC<TurnstileProps> = ({ onVerify }) => {
             // Remove the script tag from the document
             document.body.removeChild(script);
         };
-    }, [onVerify]); // Re-run effect if onVerify callback changes
+    }, []);
 
     // Render a container div for the Turnstile widget
     return <div ref={containerRef} className="flex justify-center" />;
