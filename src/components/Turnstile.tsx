@@ -25,7 +25,6 @@ declare global {
  * Renders a Cloudflare Turnstile widget for bot protection
  * 
  * @component
- * @param {object} props - Component props
  * @param {function} props.onVerify - Callback function called when verification is complete
  */
 const Turnstile: React.FC<TurnstileProps> = ({ onVerify }) => {
