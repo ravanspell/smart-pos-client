@@ -2,11 +2,12 @@
 
 import * as React from "react"
 import {
-    BookOpen,
-    Bot,
+    ChartBar,
     Origami,
     Settings2,
-    SquareTerminal,
+    Users,
+    File as FileIcon,
+    Briefcase,
 } from "lucide-react"
 
 import { NavMain } from "./nav-main"
@@ -21,7 +22,8 @@ import {
     DASHBOARD_ROUTE,
     EMPLOYEES_ROUTE,
     FILE_MANAGEMENT_ROUTE,
-    DEFAULT_SETTINGS_ROUTE
+    DEFAULT_SETTINGS_ROUTE,
+    RECRUITMENT_ROUTE
 } from "@/constants/routes"
 
 
@@ -30,48 +32,36 @@ const data = {
         {
             title: "Dashboard",
             url: DASHBOARD_ROUTE,
-            icon: SquareTerminal,
+            icon: ChartBar,
             isActive: true,
         },
         {
             title: "Employees",
             url: EMPLOYEES_ROUTE,
-            icon: Bot,
-            items: [
-                {
-                    title: "Genesis",
-                    url: "#",
-                },
-                {
-                    title: "Explorer",
-                    url: "#",
-                },
-                {
-                    title: "Quantum",
-                    url: "#",
-                },
-            ],
+            icon: Users,
+        },
+        {
+            title: "Recruitment",
+            url: RECRUITMENT_ROUTE,
+            icon: Briefcase,
         },
         {
             title: "File Management",
-            icon: BookOpen,
+            icon: FileIcon,
+            url: FILE_MANAGEMENT_ROUTE,
             items: [
                 {
-                    title: "Introduction",
+                    title: "My Files",
                     url: FILE_MANAGEMENT_ROUTE,
                 },
                 {
-                    title: "Get Started",
+                    title: "Shared Files",
                     url: "#",
                 },
                 {
-                    title: "Tutorials",
+                    title: "Trash",
                     url: "#",
-                },
-                {
-                    title: "Changelog",
-                    url: "#",
-                },
+                }
             ],
         },
         {
