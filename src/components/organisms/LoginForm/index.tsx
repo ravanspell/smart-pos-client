@@ -21,7 +21,7 @@ import Turnstile from '@/components/Turnstile';
 // Define Zod schema for validation
 const loginSchema = z.object({
     email: z.string().email('Please enter a valid email').min(1, 'Email is required'),
-    password: z.string().min(6, 'Password must be at least 6 characters').min(1, 'Password is required'),
+    password: z.string().min(1, 'Password is required'),
 });
 
 // Infer TypeScript types from Zod schema
@@ -91,53 +91,50 @@ const LoginFormComponent: React.FC = () => {
             console.error('Login error:', error);
         }
     };
-    console.log("turnstileToken--->", turnstileToken);
+
     return (
-        <>
-            <Form {...form}>
-                <form
-                    onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-4"
-                >
-                    {/* Email Field */}
-                    <FormField
-                        name="email"
-                        control={form.control}
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Email</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="Enter your email" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )} />
-                    {/* Password Field */}
-                    <FormField
-                        name="password"
-                        control={form.control}
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Password</FormLabel>
-                                <FormControl>
-                                    <Input type="password" placeholder="Enter your password" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )} />
-                    {/* Turnstile for captcha verification */}
-                    <Turnstile onVerify={handleTurnstileVerify} />
-                    {/* Submit Button */}
-                    <SubmitButton
-                        label="Login"
-                        isLoading={isLoginInProgress}
-                        className="w-full mt-4"
-                        // TODO: Uncomment this when the turnstile token needed for login
-                        // disabled={!turnstileToken}
-                    />
-                </form>
-            </Form>
-        </>
+        <Form {...form}>
+            <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+            >
+                {/* Email Field */}
+                <FormField
+                    name="email"
+                    control={form.control}
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Email</FormLabel>
+                            <FormControl>
+                                <Input placeholder="Enter your email" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                {/* Password Field */}
+                <FormField
+                    name="password"
+                    control={form.control}
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Password</FormLabel>
+                            <FormControl>
+                                <Input type="password" placeholder="Enter your password" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )} />
+                {/* Turnstile for captcha verification */}
+                <Turnstile onVerify={handleTurnstileVerify} />
+                {/* Submit Button */}
+                <SubmitButton
+                    label="Login"
+                    isLoading={isLoginInProgress}
+                    className="w-full mt-4"
+                    disabled={!turnstileToken}
+                />
+            </form>
+        </Form>
     );
 };
 

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import LoginForm from "@/components/organisms/LoginForm";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/atoms/Card';
 
 
 const LoginPage: React.FC = () => {
@@ -15,20 +16,26 @@ const LoginPage: React.FC = () => {
             </div>
 
             {/* -- Login Card -- */}
-            <div className="w-full max-w-md bg-white p-6 sm:p-8 rounded-lg shadow-md">
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-800 text-center mb-2">Sign In</h2>
-                <p className="text-gray-600 text-center mb-6">Please login to access the dashboard.</p>
-                <LoginForm />
-                {/* Forgot Password Link */}
-                <div className="text-center text-sm mt-4">
-                    <Link
-                        className="hover:underline cursor-pointer"
-                        href={{ pathname: '/password-reset' }}
-                    >
-                        Forgot password?
-                    </Link>
-                </div>
-            </div>
+            <Card className="w-full max-w-md">
+                <CardHeader>
+                    <CardTitle className="text-2xl text-center">Sign In</CardTitle>
+                    <CardDescription className="text-center">
+                        Please login to access the dashboard.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="w-full">
+                    <LoginForm />
+                    {/* Forgot Password Link */}
+                    <div className="text-center text-sm mt-4">
+                        <Link
+                            className="hover:underline cursor-pointer"
+                            href={{ pathname: '/password-reset' }}
+                        >
+                            Forgot password?
+                        </Link>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     );
 };
