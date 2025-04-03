@@ -4,10 +4,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
-
 # Add concurrency to prevent multiple deployments running simultaneously
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
