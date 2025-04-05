@@ -10,21 +10,18 @@ import { Icons } from "@/lib/icons"
 import { toast } from "sonner"
 import FileCard from "../../molecules/FileCard"
 import { useCallback, useEffect, useState } from "react"
+import ModalActionButtons from "@/components/molecules/ModalActionButtons"
+import { useConfirmFileUploadMutation } from "@/redux/api/fileManagmentAPI"
 
 export function isFileWithPreview(file: File): file is File & { preview: string } {
     return "preview" in file && typeof file.preview === "string"
 }
 
+export interface UploadFile extends File {
+    s3ObjectKey?: string;
+}
 
 interface FileUploaderProps extends React.HTMLAttributes<HTMLDivElement> {
-    /**
-     * Value of the uploader.
-     * @type File[]
-     * @default undefined
-     * @example value={files}
-     */
-    value?: File[]
-
     /**
      * Function to be called when the value changes.
      * @type (files: File[]) => void
@@ -91,11 +88,34 @@ interface FileUploaderProps extends React.HTMLAttributes<HTMLDivElement> {
      * @example disabled
      */
     disabled?: boolean
+
+    /**
+     * Function to be called when the cancel button is clicked.
+     * @type () => void
+     * @default undefined
+     * @example onCancel={() => {}}
+     */
+    onCancel: () => void
+
+    /**
+     * The parent folder ID where the file will be uploaded.
+     * @type string
+     * @default "root"
+     * @example parentId="folder-123"
+     */
+    parentId?: string
+
+    /**
+     * The S3 object key for the file.
+     * @type string
+     * @default undefined
+     * @example s3ObjectKey="temp/uuid/document.pdf"
+     */
+    s3ObjectKey?: string
 }
 
 function FileUploader(props: FileUploaderProps) {
     const {
-        value: valueProp,
         onValueChange,
         onUpload,
         progresses,
@@ -107,9 +127,15 @@ function FileUploader(props: FileUploaderProps) {
         multiple = false,
         disabled = false,
         className,
+        onCancel,
+        parentId = null,
+        s3ObjectKey,
         ...dropzoneProps
     } = props
-    const [files, setFiles] = useState<File[]>([])
+    const [files, setFiles] = useState<UploadFile[]>([]);
+    console.log("files--->", files);
+    
+    const [confirmFileUpload, { isLoading }] = useConfirmFileUploadMutation()
 
     const onDrop = useCallback(
         (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
@@ -141,7 +167,7 @@ function FileUploader(props: FileUploaderProps) {
             }
         },
 
-        [files, maxFileCount, multiple, onUpload, setFiles]
+        [files, maxFileCount, multiple]
     )
 
     function onRemove(index: number) {
@@ -165,6 +191,33 @@ function FileUploader(props: FileUploaderProps) {
     }, [])
 
     const isDisabled = disabled || (files?.length ?? 0) >= maxFileCount
+
+    const handleConfirmUpload = async () => {
+        if (!files || files.length === 0) {
+            toast.error("No files to upload")
+            return
+        }
+
+        try {
+            // Prepare the files array for the API request
+            const filesToUpload = files.map(file => ({
+                fileName: file.name,
+                parentId: parentId,
+                s3ObjectKey: file.s3ObjectKey || `temp/${Date.now()}/${file.name}`, // Use the s3ObjectKey from the file if available
+                fileSize: file.size
+            }))
+            
+            // Call the confirmFileUpload mutation with all files
+            await confirmFileUpload({
+                files: filesToUpload
+            }).unwrap()
+            
+            onCancel()
+        } catch (error) {
+            console.error("Error confirming file upload:", error)
+            toast.error("Failed to upload files")
+        }
+    }
 
     return (
         <div className="relative flex flex-col gap-6 overflow-hidden">
@@ -232,13 +285,24 @@ function FileUploader(props: FileUploaderProps) {
                         {files?.map((file, index) => (
                             <FileCard
                                 key={index}
+                                fileIndex={index}
                                 file={file}
                                 onRemove={() => onRemove(index)}
+                                setFiles={setFiles}
                             />
                         ))}
                     </div>
                 </ScrollArea>
             ) : null}
+            <ModalActionButtons
+                secondaryAction={onCancel}
+                primaryAction={handleConfirmUpload}
+                primaryId="create-folder-submit-btn"
+                secondaryId="create-folder-cancel-btn"
+                isLoading={isLoading}
+                primaryLabel='Confirm'
+                secondaryLabel='Cancel'
+            />
         </div>
     )
 }

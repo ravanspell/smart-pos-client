@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useGetPresignedUrlMutation } from '@/redux/api/fileManagmentAPI';
 
 interface UseUploadOptions {
-    onSuccess?: () => void;
+    onSuccess?: (fileKey: string) => void;
     onError?: (error: Error) => void;
     onProgress?: (progress: number) => void;
 }
@@ -77,10 +77,12 @@ export const useUpload = (options: UseUploadOptions = {}): UseUploadReturn => {
                 throw new Error('Failed to get presigned URL');
             }
 
+            const uploadUrl = response.data.uploadUrl;
+            const fileKey = response.data.key;
             // Upload file
-            await uploadToPresignedUrl(file, response.data.uploadUrl);
+            await uploadToPresignedUrl(file, uploadUrl);
             
-            options.onSuccess?.();
+            options.onSuccess?.(fileKey);
         } catch (err) {
             const error = err instanceof Error ? err : new Error('Upload failed');
             setError(error);
