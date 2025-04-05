@@ -75,7 +75,7 @@ const Dashbaord = () => {
           Add If Odd
         </Button>
       </div>
-      <FileUploader accept={{"image/*": [], "application/pdf": []}}/>
+      <FileUploader onCancel={() => {}} accept={{"image/*": [], "application/pdf": []}}/>
       <SubmitButton isLoading label="Save"/>
     </div>
   );

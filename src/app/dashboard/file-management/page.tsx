@@ -266,6 +266,7 @@ const FileFolderGrid: React.FC = () => {
                 <FileUploadModal
                     isOpen={isOpenFileUploaderModal}
                     onClose={() => setIsOpenFileUploaderModal(false)}
+                    parentId={folderId}
                 />
             }
         </div>
