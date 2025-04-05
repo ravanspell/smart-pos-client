@@ -6,6 +6,7 @@ import { FILE_MGT } from '@/constants/api';
 
 interface PresignedUrlResponse {
     uploadUrl: string;
+    key: string;
 }
 
 export interface BreadcrumbResponse {
@@ -146,6 +147,45 @@ export const fileManagementApi = createApi({
             }),
             transformResponse: (response: ApiResponse<PresignedUrlResponse>) => response,
         }),
+        // **Confirm File Upload**
+        confirmFileUpload: builder.mutation<
+            ApiResponse<FileOrFolder>,
+            { files: Array<{ fileName: string; parentId: string | null; s3ObjectKey: string; fileSize: number }> }
+        >({
+            query: (payload) => ({
+                url: FILE_MGT.CONFIRM_UPLOAD,
+                method: HTTPMethod.POST,
+                body: payload,
+            }),
+            async onQueryStarted({ files }, { dispatch, queryFulfilled }) {
+                const { data } = await queryFulfilled;
+                // Update the cache with the new files
+                // We'll update for each file's parent folder
+                const parentFolders = [...new Set(files.map(file => file.parentId))];
+                
+                parentFolders.forEach(parentId => {
+                    dispatch(
+                        fileManagementApi.util.updateQueryData(
+                            'getFolderContents',
+                            { folderId: parentId, page: 1, pageSize: 10 },
+                            (draft) => {
+                                if (draft && draft.data) {
+                                    // Add each file to the appropriate parent folder
+                                    files.forEach(file => {
+                                        if (file.parentId === parentId) {
+                                            draft.data.filesAndFolders.unshift({
+                                                ...data.data,
+                                                folder: false,
+                                            });
+                                        }
+                                    });
+                                }
+                            }
+                        )
+                    );
+                });
+            },
+        }),
     }),
 });
 
@@ -156,4 +196,5 @@ export const {
     useRenameFileMutation,
     useGetBreadcrumbQuery,
     useGetPresignedUrlMutation,
+    useConfirmFileUploadMutation,
 } = fileManagementApi;

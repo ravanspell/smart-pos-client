@@ -4,22 +4,33 @@ import { Progress } from "@/components/atoms/Progress";
 import { Icons } from "@/lib/icons";
 import { formatBytes } from "@/lib/utils";
 import { useUpload } from "@/hooks/useUpload";
+import { UploadFile } from "@/components/organisms/FileUploader";
 
 interface FileCardProps {
-    file: File;
+    file: UploadFile;
     onRemove: () => void;
+    setFiles: React.Dispatch<React.SetStateAction<UploadFile[]>>;
+    fileIndex: number;
 }
 
 const UPLOAD_COMPLETED = 100; // 100%
 
-function FileCard({ file, onRemove }: FileCardProps) {
+function FileCard({ file, onRemove, setFiles, fileIndex }: FileCardProps) {
     const { uploadFile, progress, isUploading, error } = useUpload({
         onError: (error) => {
             console.error('Upload error:', error);
         },
-        onSuccess: () => {
+        onSuccess: (fileKey: string) => {
             // Handle successful upload
             console.log('Upload completed successfully');
+            // Update the file object with the s3ObjectKey
+            setFiles((prevFiles: UploadFile[]) => {
+                const updatedFiles = [...prevFiles];
+                // Create a new UploadFile object with the s3ObjectKey
+                const updatedFile: UploadFile = Object.assign(file, { s3ObjectKey: fileKey });
+                updatedFiles[fileIndex] = updatedFile;
+                return updatedFiles;
+            });
         },
     });
 

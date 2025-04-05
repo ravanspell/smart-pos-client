@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/atoms/Button';
 import { SubmitButton } from '@/components/molecules/SubmitButton';
+import { cn } from '@/lib/utils';
 
 interface ModalActionButtonsProps {
     primaryAction?: () => void;
@@ -10,6 +11,7 @@ interface ModalActionButtonsProps {
     secondaryLabel?: string;
     primaryId?: string;
     secondaryId?: string;
+    className?: string;
 }
 
 const ModalActionButtons: React.FC<ModalActionButtonsProps> = ({
@@ -20,9 +22,10 @@ const ModalActionButtons: React.FC<ModalActionButtonsProps> = ({
     secondaryLabel = 'Secondary',
     primaryId = 'primary-button',
     secondaryId = 'secondary-button',
+    className = '',
 }) => {
     return (
-        <div className="flex justify-end gap-2 mt-4">
+        <div className={cn("flex justify-end gap-2", className)}>
             <Button
                 type="button"
                 variant="outline"
