@@ -16,10 +16,11 @@ export function SubmitButton(props: SubmitButtonProps) {
   const {
     isLoading = false,
     label,
-    disabled 
+    disabled,
+    ...rest
   } = props;
   return (
-    <Button disabled={isLoading || disabled} {...props}>
+    <Button disabled={isLoading || disabled} {...rest}>
       {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
       {label}
     </Button>
