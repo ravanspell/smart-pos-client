@@ -157,33 +157,12 @@ export const fileManagementApi = createApi({
                 method: HTTPMethod.POST,
                 body: payload,
             }),
-            async onQueryStarted({ files }, { dispatch, queryFulfilled }) {
-                const { data } = await queryFulfilled;
-                // Update the cache with the new files
-                // We'll update for each file's parent folder
+            // Invalidate the cache for the parent folders to trigger a refetch
+            invalidatesTags: (result, error, { files }) => {
+                // Get unique parent folder IDs
                 const parentFolders = [...new Set(files.map(file => file.parentId))];
-                
-                parentFolders.forEach(parentId => {
-                    dispatch(
-                        fileManagementApi.util.updateQueryData(
-                            'getFolderContents',
-                            { folderId: parentId, page: 1, pageSize: 10 },
-                            (draft) => {
-                                if (draft && draft.data) {
-                                    // Add each file to the appropriate parent folder
-                                    files.forEach(file => {
-                                        if (file.parentId === parentId) {
-                                            draft.data.filesAndFolders.unshift({
-                                                ...data.data,
-                                                folder: false,
-                                            });
-                                        }
-                                    });
-                                }
-                            }
-                        )
-                    );
-                });
+                // Return tags for each parent folder
+                return parentFolders.map(parentId => ({ type: 'Folder', id: parentId || 'ROOT' }));
             },
         }),
     }),
