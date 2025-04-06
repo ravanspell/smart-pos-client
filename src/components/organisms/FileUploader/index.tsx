@@ -288,7 +288,6 @@ function FileUploader(props: FileUploaderProps) {
                                 file={file}
                                 onRemove={() => onRemove(index)}
                                 setFiles={setFiles}
-                                allFiles={files}
                             />
                         ))}
                     </div>

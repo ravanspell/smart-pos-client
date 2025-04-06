@@ -1,11 +1,12 @@
 "use client"
 
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { Icons } from "@/lib/icons"
 import { formatBytes } from "@/lib/utils"
 import { UploadFile } from "@/components/molecules/FormFileUploader"
 import { useUpload } from "@/hooks/useUpload"
 import { Progress } from "@/components/atoms/Progress"
+import { Button } from "@/components/atoms/Button"
 
 interface FileCardProps {
   /**
@@ -21,13 +22,6 @@ interface FileCardProps {
    * @example fileIndex={0}
    */
   fileIndex: number
-
-  /**
-   * All files in the upload list.
-   * @type UploadFile[]
-   * @example allFiles={files}
-   */
-  allFiles: UploadFile[]
 
   /**
    * Callback when the file is removed.
@@ -46,17 +40,19 @@ interface FileCardProps {
 
 const UPLOAD_COMPLETED = 100 // 100%
 
-const FileCard = ({ file, fileIndex, allFiles, onRemove, setFiles }: FileCardProps) => {
+const FileCard = ({ file, fileIndex, onRemove, setFiles }: FileCardProps) => {
   // Use a ref to track whether we've already started the upload for this file
   const uploadStartedRef = useRef(false);
+  // Track if the file has an error
+  const [hasError, setHasError] = useState(false);
   
   const { uploadFile, progress, isUploading, error } = useUpload({
     onError: (error) => {
-      console.error('Upload error:', error)
+      setHasError(true);
     },
     onSuccess: (fileKey: string) => {
       // Handle successful upload
-      console.log('Upload completed successfully with key:', fileKey)
+      setHasError(false);
       
       // Update the temporary state with the new S3 object key
       // We use a functional update to ensure we're working with the latest state
@@ -86,6 +82,13 @@ const FileCard = ({ file, fileIndex, allFiles, onRemove, setFiles }: FileCardPro
     }
   }, []);
   
+  // Function to retry the upload
+  const handleRetry = () => {
+    setHasError(false);
+    uploadStartedRef.current = false;
+    uploadFile(file).catch(console.error);
+  };
+  
   return (
     <div className="flex items-center gap-4 rounded-lg border p-4">
       <div className="flex-1 space-y-1">
@@ -94,10 +97,20 @@ const FileCard = ({ file, fileIndex, allFiles, onRemove, setFiles }: FileCardPro
         {isUploading && progress !== UPLOAD_COMPLETED && (
           <Progress className="h-1" value={progress} />
         )}
-        {error && (
-          <p className="text-xs text-destructive">
-            Upload failed: {error.message}
-          </p>
+        {hasError && (
+          <div className="flex items-center gap-2">
+            <p className="text-xs text-destructive">
+              Upload failed: {error?.message || "Unknown error"}
+            </p>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleRetry}
+              className="h-6 px-2 text-xs"
+            >
+              <Icons.spinner className="mr-1 h-3 w-3" />
+            </Button>
+          </div>
         )}
       </div>
       <button

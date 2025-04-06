@@ -117,7 +117,6 @@ const FileUploadForm = ({
                   multiple={true}
                   disabled={isLoading || isSubmitting}
                   error={!!form.formState.errors.files}
-                  errorMessage={form.formState.errors.files?.message as string}
                 />
               </FormControl>
               <FormMessage />
@@ -129,7 +128,7 @@ const FileUploadForm = ({
           secondaryAction={onCancel}
           primaryAction={() => form.handleSubmit(handleSubmit)()}
           primaryLabel="Upload"
-          secondaryLabel="Confirm"
+          secondaryLabel="Cancel"
         />
       </form>
     </Form>

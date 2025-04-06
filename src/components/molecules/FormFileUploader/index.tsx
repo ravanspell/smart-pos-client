@@ -73,13 +73,6 @@ export interface FormFileUploaderProps {
    * @default false
    */
   error?: boolean
-
-  /**
-   * The error message to display.
-   * @type string
-   * @example errorMessage="Please upload at least one file."
-   */
-  errorMessage?: string
 }
 
 const FormFileUploader = React.forwardRef<HTMLDivElement, FormFileUploaderProps>(
@@ -92,8 +85,7 @@ const FormFileUploader = React.forwardRef<HTMLDivElement, FormFileUploaderProps>
       maxFileCount = 5,
       multiple = true,
       disabled = false,
-      error = false,
-      errorMessage,
+      error = false
     },
     ref
   ) => {
@@ -181,10 +173,6 @@ const FormFileUploader = React.forwardRef<HTMLDivElement, FormFileUploaderProps>
           </div>
         </div>
 
-        {error && errorMessage && (
-          <p className="text-sm text-destructive">{errorMessage}</p>
-        )}
-
         {files.length > 0 && (
           <ScrollArea className="h-[200px]">
             <div className="space-y-2">
@@ -195,7 +183,6 @@ const FormFileUploader = React.forwardRef<HTMLDivElement, FormFileUploaderProps>
                   fileIndex={index}
                   onRemove={() => handleRemove(index)}
                   setFiles={setTempFiles}
-                  allFiles={tempFiles}
                 />
               ))}
             </div>
