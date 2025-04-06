@@ -31,7 +31,7 @@ export const fileManagementApi = createApi({
                 if (folderId) params.append('folderId', folderId);
                 params.append('page', page.toString());
                 params.append('pageSize', pageSize.toString());
-                return `file-management?${params.toString()}`;
+                return `${FILE_MGT.GET_FOLDER_CONTENTS}?${params.toString()}`;
             },
             transformResponse: (response: ApiResponse<GetFolderContentsResponse>) => response,
             providesTags: (result, error, { folderId }) => [{ type: 'Folder', id: folderId || 'ROOT' }],
@@ -42,30 +42,14 @@ export const fileManagementApi = createApi({
             { parentId: string; name: string }
         >({
             query: ({ parentId, name }) => ({
-                url: '/file-management/create-folder',
+                url: FILE_MGT.CREATE_FOLDER,
                 method: HTTPMethod.POST,
                 body: { name, parentId },
             }),
-            async onQueryStarted({ parentId }, { dispatch, queryFulfilled }) {
-                const { data } = await queryFulfilled;
-                // Update the cache with the new folder
-                dispatch(
-                    fileManagementApi.util.updateQueryData(
-                        'getFolderContents',
-                        { folderId: parentId, page: 1, pageSize: 10 },
-                        (draft) => {
-                            if (draft && draft.data) {
-                                draft.data.filesAndFolders.unshift({
-                                    ...data.data,
-                                    folder: true,
-                                    fileCount: 0,
-                                    folderCount: 0,
-                                });
-                            }
-                        }
-                    )
-                );
-            },
+            // Invalidate the cache for the parent folder to trigger a refetch
+            invalidatesTags: (result, error, { parentId }) => [
+                { type: 'Folder', id: parentId || 'ROOT' }
+            ],
         }),
         // **Rename Folder**
         renameFolder: builder.mutation<
@@ -73,7 +57,7 @@ export const fileManagementApi = createApi({
             { folderId: string; newName: string; parentId: string }
         >({
             query: ({ folderId, newName }) => ({
-                url: 'rename-folder',
+                url: FILE_MGT.RENAME_FOLDER,
                 method: HTTPMethod.PATCH,
                 body: { folderId, newName },
             }),
@@ -104,7 +88,7 @@ export const fileManagementApi = createApi({
             { fileId: string; newName: string; parentFolderId: string }
         >({
             query: ({ fileId, newName }) => ({
-                url: 'rename-file',
+                url: FILE_MGT.RENAME_FILE,
                 method: HTTPMethod.PATCH,
                 body: { fileId, newName },
             }),
