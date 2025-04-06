@@ -133,7 +133,6 @@ function FileUploader(props: FileUploaderProps) {
         ...dropzoneProps
     } = props
     const [files, setFiles] = useState<UploadFile[]>([]);
-    console.log("files--->", files);
     
     const [confirmFileUpload, { isLoading }] = useConfirmFileUploadMutation()
 
@@ -289,6 +288,7 @@ function FileUploader(props: FileUploaderProps) {
                                 file={file}
                                 onRemove={() => onRemove(index)}
                                 setFiles={setFiles}
+                                allFiles={files}
                             />
                         ))}
                     </div>

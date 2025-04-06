@@ -1,80 +1,115 @@
-import { useEffect } from "react";
-import { Button } from "@/components/atoms/Button";
-import { Progress } from "@/components/atoms/Progress";
-import { Icons } from "@/lib/icons";
-import { formatBytes } from "@/lib/utils";
-import { useUpload } from "@/hooks/useUpload";
-import { UploadFile } from "@/components/organisms/FileUploader";
+"use client"
+
+import React, { useEffect, useRef } from "react"
+import { Icons } from "@/lib/icons"
+import { formatBytes } from "@/lib/utils"
+import { UploadFile } from "@/components/molecules/FormFileUploader"
+import { useUpload } from "@/hooks/useUpload"
+import { Progress } from "@/components/atoms/Progress"
 
 interface FileCardProps {
-    file: UploadFile;
-    onRemove: () => void;
-    setFiles: React.Dispatch<React.SetStateAction<UploadFile[]>>;
-    fileIndex: number;
+  /**
+   * The file to display.
+   * @type UploadFile
+   * @example file={file}
+   */
+  file: UploadFile
+
+  /**
+   * The index of the file in the list.
+   * @type number
+   * @example fileIndex={0}
+   */
+  fileIndex: number
+
+  /**
+   * All files in the upload list.
+   * @type UploadFile[]
+   * @example allFiles={files}
+   */
+  allFiles: UploadFile[]
+
+  /**
+   * Callback when the file is removed.
+   * @type () => void
+   * @example onRemove={() => handleRemove(0)}
+   */
+  onRemove: () => void
+
+  /**
+   * Callback when files are updated.
+   * @type (files: UploadFile[] | ((prevFiles: UploadFile[]) => UploadFile[])) => void
+   * @example setFiles={(files) => handleFiles(files)}
+   */
+  setFiles: (files: UploadFile[] | ((prevFiles: UploadFile[]) => UploadFile[])) => void
 }
 
-const UPLOAD_COMPLETED = 100; // 100%
+const UPLOAD_COMPLETED = 100 // 100%
 
-function FileCard({ file, onRemove, setFiles, fileIndex }: FileCardProps) {
-    const { uploadFile, progress, isUploading, error } = useUpload({
-        onError: (error) => {
-            console.error('Upload error:', error);
-        },
-        onSuccess: (fileKey: string) => {
-            // Handle successful upload
-            console.log('Upload completed successfully');
-            // Update the file object with the s3ObjectKey
-            setFiles((prevFiles: UploadFile[]) => {
-                const updatedFiles = [...prevFiles];
-                // Create a new UploadFile object with the s3ObjectKey
-                const updatedFile: UploadFile = Object.assign(file, { s3ObjectKey: fileKey });
-                updatedFiles[fileIndex] = updatedFile;
-                return updatedFiles;
-            });
-        },
-    });
+const FileCard = ({ file, fileIndex, allFiles, onRemove, setFiles }: FileCardProps) => {
+  // Use a ref to track whether we've already started the upload for this file
+  const uploadStartedRef = useRef(false);
+  
+  const { uploadFile, progress, isUploading, error } = useUpload({
+    onError: (error) => {
+      console.error('Upload error:', error)
+    },
+    onSuccess: (fileKey: string) => {
+      // Handle successful upload
+      console.log('Upload completed successfully with key:', fileKey)
+      
+      // Update the temporary state with the new S3 object key
+      // We use a functional update to ensure we're working with the latest state
+      setFiles((prevFiles) => {
+        // Create a deep copy of the files array
+        return prevFiles.map((f, index) => {
+          if (index === fileIndex) {
+            // For the current file, create a new UploadFile with the s3ObjectKey
+            return Object.assign(new File([f], f.name, { type: f.type }), { 
+              preview: f.preview,
+              s3ObjectKey: fileKey 
+            }) as UploadFile;
+          } else {
+            // For other files, keep them as they are
+            return f;
+          }
+        });
+      });
+    },
+  })
 
-    useEffect(() => {
-        uploadFile(file).catch(console.error);
-    }, [file]);
-
-    return (
-        <div className="relative flex items-center gap-2.5">
-            <div className="flex flex-1 gap-2.5">
-                <div className="flex w-full flex-col gap-2">
-                    <div className="flex flex-col gap-px">
-                        <p className="line-clamp-1 text-sm font-medium text-foreground/80">
-                            {file.name}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                            {formatBytes(file.size)}
-                        </p>
-                    </div>
-                    {isUploading && progress !== UPLOAD_COMPLETED && (
-                        <Progress className="h-1" value={progress} />
-                    )}
-                    {error && (
-                        <p className="text-xs text-destructive">
-                            Upload failed: {error.message}
-                        </p>
-                    )}
-                </div>
-            </div>
-            <div className="flex items-center gap-2">
-                <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    className="size-7"
-                    onClick={onRemove}
-                    disabled={isUploading}
-                >
-                    <Icons.close className="size-4" aria-hidden="true" />
-                    <span className="sr-only">Remove file</span>
-                </Button>
-            </div>
-        </div>
-    );
+  useEffect(() => {
+    // Start upload when component mounts, but only if we haven't started it yet
+    if (!file.s3ObjectKey && !uploadStartedRef.current) {
+      uploadStartedRef.current = true;
+      uploadFile(file).catch(console.error);
+    }
+  }, []);
+  
+  return (
+    <div className="flex items-center gap-4 rounded-lg border p-4">
+      <div className="flex-1 space-y-1">
+        <p className="text-sm font-medium">{file.name}</p>
+        <p className="text-xs text-muted-foreground">{formatBytes(file.size)}</p>
+        {isUploading && progress !== UPLOAD_COMPLETED && (
+          <Progress className="h-1" value={progress} />
+        )}
+        {error && (
+          <p className="text-xs text-destructive">
+            Upload failed: {error.message}
+          </p>
+        )}
+      </div>
+      <button
+        type="button"
+        onClick={onRemove}
+        className="rounded-full p-1.5 text-muted-foreground/80 transition-colors hover:bg-muted hover:text-muted-foreground"
+        disabled={isUploading}
+      >
+        <Icons.close className="size-4" />
+      </button>
+    </div>
+  )
 }
 
-export default FileCard;
+export default FileCard

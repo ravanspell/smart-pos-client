@@ -1,7 +1,7 @@
 import { FC, lazy } from 'react';
 import Modal from '@/components/molecules/Modal';
 
-const FileUploader = lazy(() => import('../FileUploader'));
+const FileUploadForm = lazy(() => import('../../molecules/FileUploadForm'));
 
 type FileUploadModalProps = {
     isOpen: boolean;
@@ -20,10 +20,7 @@ const FileUploadModal: FC<FileUploadModalProps> = ({ isOpen, onClose, parentId }
         >
             <div className='mt-1'>
                 {isOpen && (
-                    <FileUploader
-                        maxSize={1024 * 1024 * 1024 * 2} // 2GB
-                        multiple accept={{ "image/*": [], "application/pdf": [] }}
-                        maxFileCount={20}
+                    <FileUploadForm
                         onCancel={onClose}
                         parentId={parentId}
                     />
