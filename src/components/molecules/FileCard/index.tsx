@@ -45,7 +45,7 @@ const FileCard = ({ file, fileIndex, onRemove, setFiles }: FileCardProps) => {
   const uploadStartedRef = useRef(false);
   // Track if the file has an error
   const [hasError, setHasError] = useState(false);
-  
+
   const { uploadFile, progress, isUploading, error } = useUpload({
     onError: (error) => {
       setHasError(true);
@@ -53,7 +53,7 @@ const FileCard = ({ file, fileIndex, onRemove, setFiles }: FileCardProps) => {
     onSuccess: (fileKey: string) => {
       // Handle successful upload
       setHasError(false);
-      
+
       // Update the temporary state with the new S3 object key
       // We use a functional update to ensure we're working with the latest state
       setFiles((prevFiles) => {
@@ -61,9 +61,9 @@ const FileCard = ({ file, fileIndex, onRemove, setFiles }: FileCardProps) => {
         return prevFiles.map((f, index) => {
           if (index === fileIndex) {
             // For the current file, create a new UploadFile with the s3ObjectKey
-            return Object.assign(new File([f], f.name, { type: f.type }), { 
+            return Object.assign(new File([f], f.name, { type: f.type }), {
               preview: f.preview,
-              s3ObjectKey: fileKey 
+              s3ObjectKey: fileKey
             }) as UploadFile;
           } else {
             // For other files, keep them as they are
@@ -81,18 +81,20 @@ const FileCard = ({ file, fileIndex, onRemove, setFiles }: FileCardProps) => {
       uploadFile(file).catch(console.error);
     }
   }, []);
-  
+
   // Function to retry the upload
   const handleRetry = () => {
     setHasError(false);
     uploadStartedRef.current = false;
     uploadFile(file).catch(console.error);
   };
-  
+
   return (
     <div className="flex items-center gap-4 rounded-lg border p-4">
       <div className="flex-1 space-y-1">
-        <p className="text-sm font-medium">{file.name}</p>
+        <p className="text-sm font-medium truncate max-w-[300px] cursor-default" title={file.name}>
+          {file.name}
+        </p>
         <p className="text-xs text-muted-foreground">{formatBytes(file.size)}</p>
         {isUploading && progress !== UPLOAD_COMPLETED && (
           <Progress className="h-1" value={progress} />
@@ -102,9 +104,9 @@ const FileCard = ({ file, fileIndex, onRemove, setFiles }: FileCardProps) => {
             <p className="text-xs text-destructive">
               Upload failed: {error?.message || "Unknown error"}
             </p>
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={handleRetry}
               className="h-6 px-2 text-xs"
             >
