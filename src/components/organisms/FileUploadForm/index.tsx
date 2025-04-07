@@ -15,7 +15,7 @@ import FormFileUploader, {
   type UploadFile,
 } from "@/components/molecules/FormFileUploader"
 import { useConfirmFileUploadMutation } from "@/redux/api/fileManagmentAPI"
-import ModalActionButtons from "../ModalActionButtons"
+import ModalActionButtons from "../../molecules/ModalActionButtons"
 
 const formSchema = z.object({
   files: z

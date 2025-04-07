@@ -1,7 +1,7 @@
 import { FC, lazy } from 'react';
 import Modal from '@/components/molecules/Modal';
 
-const FileUploadForm = lazy(() => import('../../molecules/FileUploadForm'));
+const FileUploadForm = lazy(() => import('../FileUploadForm'));
 
 type FileUploadModalProps = {
     isOpen: boolean;
