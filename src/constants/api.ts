@@ -14,3 +14,8 @@ export const FILE_MGT = {
     GET_FOLDER_CONTENTS: 'v1/file-management',
     CONFIRM_UPLOAD: 'v1/file-management/upload/confirm'
 }
+
+export const APP = {
+    HEALTH_CHECK: 'app/health-check',
+    WAKEUP: 'app/wakeup'
+}

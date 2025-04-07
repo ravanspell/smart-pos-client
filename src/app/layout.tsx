@@ -11,6 +11,7 @@ import { TailwindIndicator } from "@/components/utilComponents/tailwind-indicato
 import './globals.css';
 import { ThemeProvider } from "@/components/utilComponents/theme-provider";
 import NotificationDisplay from "./notification-display";
+import ServerHealthCheck from "@/components/utilComponents/ServerHealthCheck";
 
 interface Props {
   readonly children: ReactNode;
@@ -22,7 +23,6 @@ const fontSans = FontSans({
 })
 
 export default function RootLayout({ children }: Props) {
-
   return (
     <StoreProvider>
       <html lang="en" suppressHydrationWarning>
@@ -36,10 +36,11 @@ export default function RootLayout({ children }: Props) {
           <NextTopLoader showSpinner={false} />
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <Toaster />
-            {/* Suspense is used to load the page content lazily */}
-            <Suspense fallback={<div>Loading...</div>}>
-              {children}
-            </Suspense>
+            <ServerHealthCheck>
+              <Suspense fallback={<div>Loading...</div>}>
+                {children}
+              </Suspense>
+            </ServerHealthCheck>
             <TailwindIndicator />
           </ThemeProvider>
         </body>
