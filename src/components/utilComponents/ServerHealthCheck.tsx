@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useHealthCheckQuery, useWakeupMutation } from "@/redux/api/appAPI";
 
 interface Props {
@@ -6,22 +6,24 @@ interface Props {
 }
 
 export default function ServerHealthCheck({ children }: Props) {
+    const [shouldPoll, setShouldPoll] = useState(true);
     const [wakeup] = useWakeupMutation();
-    const { data: healthData, refetch } = useHealthCheckQuery(undefined, {
-        pollingInterval: 5000,
+    const { data: healthData, refetch, error: healthError } = useHealthCheckQuery(undefined, {
+        pollingInterval: shouldPoll ? 5000 : 0,
     });
-
-    const checkHealth = async () => {
-        // If we have health data and it's successful, stop polling
-        if (healthData?.success && healthData.data.status === 'ok') {
-            return;
-        }
-
-        // If we have an error or no successful health data, try to wake up
+    
+    const checkHealth = async (): Promise<void> => {
         try {
-            await wakeup().unwrap();
-            // After wakeup, refetch health check
-            refetch();
+            // If we have health data and it's successful, stop polling
+            if (healthData?.success && healthData.data.status === 'ok') {
+                setShouldPoll(false);
+                return;
+            } else if (healthError) {
+                // If we have an error or no successful health data, try to wake up
+                await wakeup().unwrap();
+                // After wakeup, refetch health check
+                refetch();
+            }
         } catch (error) {
             console.error('Failed to wake up server:', error);
         }
