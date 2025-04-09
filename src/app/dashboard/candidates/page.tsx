@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { Button } from '@/components/atoms/Button';
 import { Plus } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { CandidatesInReview } from '@/components/organisms/CandidatesInReview';
-import { CandidatesPoll } from '@/components/organisms/CandidatesPoll';
+import CandidatesInReview from '@/components/organisms/CandidatesInReview';
+import CandidatesPool from '@/components/organisms/CandidatesPool';
 
 // Lazy load the create candidate modal
 const CreateCandidateModal = dynamic(
@@ -13,7 +13,7 @@ const CreateCandidateModal = dynamic(
   { ssr: false }
 );
 
-export default function CandidatesPage() {
+function CandidatesPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   return (
@@ -28,7 +28,7 @@ export default function CandidatesPage() {
 
       <div className="space-y-8">
         <CandidatesInReview />
-        <CandidatesPoll />
+        <CandidatesPool />
       </div>
 
       {isCreateModalOpen && (
@@ -40,3 +40,5 @@ export default function CandidatesPage() {
     </div>
   );
 }
+
+export default CandidatesPage;
