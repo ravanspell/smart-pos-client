@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { DataTable } from '@/components/molecules/DataTable/DataTable';
 import { Candidate } from '@/types/candidate';
-import { ColumnDef, SortingState, PaginationState } from '@tanstack/react-table';
+import { ColumnDef, SortingState, PaginationState, RowSelectionState } from '@tanstack/react-table';
 import { Eye, Pencil, Trash } from 'lucide-react';
 import { Button } from '@/components/atoms/Button';
 
@@ -11,27 +11,199 @@ function CandidatesPool() {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(true);
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
 
   useEffect(() => {
-    // TODO: Fetch candidates with IDLE status
-    // This is a placeholder for the actual API call
-    const fetchCandidates = async () => {
-      try {
-        // const response = await fetch('/api/candidates?status=IDLE');
-        // const data = await response.json();
-        // setCandidates(data);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching candidates:', error);
-        setLoading(false);
-      }
-    };
+    // Dummy data for candidates
+    const dummyCandidates: Candidate[] = [
+      {
+        id: '1',
+        name: 'John Smith',
+        email: 'john.smith@example.com',
+        status: 'IDLE',
+        resumeUrl: '/resumes/john-smith.pdf',
+        createdAt: new Date('2024-03-15').toISOString(),
+        updatedAt: new Date('2024-03-15').toISOString(),
+      },
+      {
+        id: '2',
+        name: 'Sarah Johnson',
+        email: 'sarah.j@example.com',
+        status: 'IDLE',
+        resumeUrl: '/resumes/sarah-johnson.pdf',
+        createdAt: new Date('2024-03-14').toISOString(),
+        updatedAt: new Date('2024-03-14').toISOString(),
+      },
+      {
+        id: '3',
+        name: 'Michael Chen',
+        email: 'm.chen@example.com',
+        status: 'IDLE',
+        resumeUrl: '/resumes/michael-chen.pdf',
+        createdAt: new Date('2024-03-13').toISOString(),
+        updatedAt: new Date('2024-03-13').toISOString(),
+      },
+      {
+        id: '4',
+        name: 'Emily Brown',
+        email: 'emily.b@example.com',
+        status: 'IDLE',
+        resumeUrl: '/resumes/emily-brown.pdf',
+        createdAt: new Date('2024-03-12').toISOString(),
+        updatedAt: new Date('2024-03-12').toISOString(),
+      },
+      {
+        id: '5',
+        name: 'David Wilson',
+        email: 'd.wilson@example.com',
+        status: 'IDLE',
+        resumeUrl: '/resumes/david-wilson.pdf',
+        createdAt: new Date('2024-03-11').toISOString(),
+        updatedAt: new Date('2024-03-11').toISOString(),
+      },
+      {
+        id: '6',
+        name: 'Lisa Anderson',
+        email: 'lisa.a@example.com',
+        status: 'IDLE',
+        resumeUrl: '/resumes/lisa-anderson.pdf',
+        createdAt: new Date('2024-03-10').toISOString(),
+        updatedAt: new Date('2024-03-10').toISOString(),
+      },
+      {
+        id: '7',
+        name: 'James Taylor',
+        email: 'j.taylor@example.com',
+        status: 'IDLE',
+        resumeUrl: '/resumes/james-taylor.pdf',
+        createdAt: new Date('2024-03-09').toISOString(),
+        updatedAt: new Date('2024-03-09').toISOString(),
+      },
+      {
+        id: '8',
+        name: 'Maria Garcia',
+        email: 'm.garcia@example.com',
+        status: 'IDLE',
+        resumeUrl: '/resumes/maria-garcia.pdf',
+        createdAt: new Date('2024-03-08').toISOString(),
+        updatedAt: new Date('2024-03-08').toISOString(),
+      },
+      {
+        id: '9',
+        name: 'Robert Lee',
+        email: 'r.lee@example.com',
+        status: 'IDLE',
+        resumeUrl: '/resumes/robert-lee.pdf',
+        createdAt: new Date('2024-03-07').toISOString(),
+        updatedAt: new Date('2024-03-07').toISOString(),
+      },
+      {
+        id: '10',
+        name: 'Patricia White',
+        email: 'p.white@example.com',
+        status: 'IDLE',
+        resumeUrl: '/resumes/patricia-white.pdf',
+        createdAt: new Date('2024-03-06').toISOString(),
+        updatedAt: new Date('2024-03-06').toISOString(),
+      },
+      {
+        id: '11',
+        name: 'Thomas Moore',
+        email: 't.moore@example.com',
+        status: 'IDLE',
+        resumeUrl: '/resumes/thomas-moore.pdf',
+        createdAt: new Date('2024-03-05').toISOString(),
+        updatedAt: new Date('2024-03-05').toISOString(),
+      },
+      {
+        id: '12',
+        name: 'Jennifer Davis',
+        email: 'j.davis@example.com',
+        status: 'IDLE',
+        resumeUrl: '/resumes/jennifer-davis.pdf',
+        createdAt: new Date('2024-03-04').toISOString(),
+        updatedAt: new Date('2024-03-04').toISOString(),
+      },
+      {
+        id: '13',
+        name: 'William Clark',
+        email: 'w.clark@example.com',
+        status: 'IDLE',
+        resumeUrl: '/resumes/william-clark.pdf',
+        createdAt: new Date('2024-03-03').toISOString(),
+        updatedAt: new Date('2024-03-03').toISOString(),
+      },
+      {
+        id: '14',
+        name: 'Elizabeth Hall',
+        email: 'e.hall@example.com',
+        status: 'IDLE',
+        resumeUrl: '/resumes/elizabeth-hall.pdf',
+        createdAt: new Date('2024-03-02').toISOString(),
+        updatedAt: new Date('2024-03-02').toISOString(),
+      },
+      {
+        id: '15',
+        name: 'Daniel Young',
+        email: 'd.young@example.com',
+        status: 'IDLE',
+        resumeUrl: '/resumes/daniel-young.pdf',
+        createdAt: new Date('2024-03-01').toISOString(),
+        updatedAt: new Date('2024-03-01').toISOString(),
+      },
+      {
+        id: '16',
+        name: 'Nancy King',
+        email: 'n.king@example.com',
+        status: 'IDLE',
+        resumeUrl: '/resumes/nancy-king.pdf',
+        createdAt: new Date('2024-02-29').toISOString(),
+        updatedAt: new Date('2024-02-29').toISOString(),
+      },
+      {
+        id: '17',
+        name: 'Christopher Wright',
+        email: 'c.wright@example.com',
+        status: 'IDLE',
+        resumeUrl: '/resumes/christopher-wright.pdf',
+        createdAt: new Date('2024-02-28').toISOString(),
+        updatedAt: new Date('2024-02-28').toISOString(),
+      },
+      {
+        id: '18',
+        name: 'Margaret Scott',
+        email: 'm.scott@example.com',
+        status: 'IDLE',
+        resumeUrl: '/resumes/margaret-scott.pdf',
+        createdAt: new Date('2024-02-27').toISOString(),
+        updatedAt: new Date('2024-02-27').toISOString(),
+      },
+      {
+        id: '19',
+        name: 'Joseph Green',
+        email: 'j.green@example.com',
+        status: 'IDLE',
+        resumeUrl: '/resumes/joseph-green.pdf',
+        createdAt: new Date('2024-02-26').toISOString(),
+        updatedAt: new Date('2024-02-26').toISOString(),
+      },
+      {
+        id: '20',
+        name: 'Susan Baker',
+        email: 's.baker@example.com',
+        status: 'IDLE',
+        resumeUrl: '/resumes/susan-baker.pdf',
+        createdAt: new Date('2024-02-25').toISOString(),
+        updatedAt: new Date('2024-02-25').toISOString(),
+      },
+    ];
 
-    fetchCandidates();
+    setCandidates(dummyCandidates);
+    setLoading(false);
   }, []);
 
   const columns: ColumnDef<Candidate>[] = [
@@ -103,6 +275,9 @@ function CandidatesPool() {
           pagination={pagination}
           onSortingChange={setSorting}
           onPaginationChange={setPagination}
+          rowSelection={rowSelection}
+          onRowSelectionChange={setRowSelection}
+          enableRowSelection={true}
         />
       )}
     </section>
