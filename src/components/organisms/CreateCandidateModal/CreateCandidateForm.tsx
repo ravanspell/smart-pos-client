@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import FormFileUploader, { UploadFile } from '@/components/molecules/FormFileUploader';
 import ModalActionButtons from '@/components/molecules/ModalActionButtons';
+import { UploadCVRequest, useUploadCVMutation } from '@/redux/api/candidatesApi';
+import { toast } from 'sonner';
 
 interface CreateCandidateFormProps {
   onClose: () => void;
@@ -14,7 +16,7 @@ const MAX_FILES = 50;
 
 export function CreateCandidateForm({ onClose }: CreateCandidateFormProps) {
   const [files, setFiles] = useState<UploadFile[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
+  const [uploadCV] = useUploadCVMutation();
 
   const handleFileChange = (selectedFiles: UploadFile[] | ((prevFiles: UploadFile[]) => UploadFile[])) => {
     if (typeof selectedFiles === 'function') {
@@ -24,29 +26,30 @@ export function CreateCandidateForm({ onClose }: CreateCandidateFormProps) {
     }
   };
 
+  /**
+   * Handles the upload of files to the server.
+   * @returns {Promise<void>}
+   */
   const handleUpload = async () => {
     if (files.length === 0) {
-      // Show error message
+      toast.error('Please select at least one file to upload');
       return;
     }
-
-    setIsUploading(true);
     try {
-      // TODO: Implement file upload logic
-      // const formData = new FormData();
-      // files.forEach(file => formData.append('files', file));
-      // await fetch('/api/candidates/upload', {
-      //   method: 'POST',
-      //   body: formData,
-      // });
-
-      // Show success message
+      const uploadCVRequests: UploadCVRequest[] = files.map((file) => (  
+        {
+          fileName: file.name,
+          s3ObjectKey: file.s3ObjectKey || '',
+          fileSize: file.size,
+        }
+      ));
+      console.log("uploadCVRequests", uploadCVRequests);
+      await uploadCV(uploadCVRequests).unwrap();
+      toast.success('Files uploaded successfully');
       onClose();
     } catch (error) {
-      // Show error message
       console.error('Error uploading files:', error);
-    } finally {
-      setIsUploading(false);
+      toast.error('Failed to upload files. Please try again.');
     }
   };
 
@@ -64,9 +67,8 @@ export function CreateCandidateForm({ onClose }: CreateCandidateFormProps) {
       <ModalActionButtons
         primaryAction={handleUpload}
         secondaryAction={onClose}
-        primaryLabel={isUploading ? 'Uploading...' : 'Upload'}
+        primaryLabel="Upload"
         secondaryLabel="Cancel"
-        isLoading={isUploading}
       />
     </div>
   );

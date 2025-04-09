@@ -19,3 +19,7 @@ export const APP = {
     HEALTH_CHECK: 'app/health-check',
     WAKEUP: 'app/wakeup'
 }
+
+export const CANDIDATES = {
+    CREATE_CANDIDATE: 'v1/candidate/create-candidates'
+}
