@@ -22,5 +22,6 @@ export const APP = {
 
 export const CANDIDATES = {
     CREATE_CANDIDATE: 'v1/candidate/create-candidates',
-    SEARCH_CANDIDATES: '/v1/candidate'
+    SEARCH_CANDIDATES: '/v1/candidate',
+    GET_CANDIDATE: '/v1/candidate'
 }

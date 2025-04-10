@@ -19,16 +19,54 @@ interface UploadCVResponse {
     updatedAt: string;
 }
 
-// New interfaces for candidate fetching
+interface WorkExperience {
+    company: string;
+    duration: string;
+    jobTitle: string;
+    responsibilities: string[];
+}
+
+interface Education {
+    degree: string;
+    institution: string;
+    graduationYear: string;
+}
+
+interface Project {
+    project_title: string;
+    description: string;
+}
+
+interface ResumeRecommendations {
+    jobRecommendations: string[];
+    resumeOptimization: string;
+}
+
+interface StructuredData {
+    skills: string[];
+    projects: Project[];
+    education: Education[];
+    certifications: string[];
+    workExperience: WorkExperience[];
+}
+
+interface Resume {
+    structuredData: StructuredData;
+    recommendations: ResumeRecommendations;
+}
+
+// Updated Candidate interface with all required fields
 export interface Candidate {
     id: string;
     firstName: string;
     lastName: string;
     email: string;
     phone: string;
+    currentPosition: string;
     status: string;
     createdAt: string;
     updatedAt: string;
+    resume: Resume;
 }
 
 export interface CandidatesResponse {
@@ -50,6 +88,13 @@ export interface GetCandidatesParams {
     limit?: number;
 }
 
+export interface GetCandidateByIdResponse {
+    statusCode: number;
+    msg: string | null;
+    success: boolean;
+    data: Candidate;
+}
+
 const candidateInvalidateTags = ['Candidate-review'];
 
 export const candidatesApi = createApi({
@@ -63,7 +108,6 @@ export const candidatesApi = createApi({
                 method: HTTPMethod.POST,
                 body: { resumeFiles: data },
             }),
-            // force to refetch review candidates when a new candidate is uploaded
             invalidatesTags: candidateInvalidateTags,
         }),
         getCandidatesInReview: builder.query<CandidatesResponse, GetCandidatesParams>({
@@ -76,10 +120,18 @@ export const candidatesApi = createApi({
             },
             providesTags: candidateInvalidateTags,
         }),
+        getCandidateById: builder.query<GetCandidateByIdResponse, string>({
+            query: (candidateId) => ({
+                url: `${CANDIDATES.GET_CANDIDATE}/${candidateId}`,
+                method: HTTPMethod.GET,
+            }),
+            providesTags: (result, error, id) => [{ type: 'Candidate-review', id }],
+        }),
     }),
 });
 
 export const {
     useUploadCVMutation,
-    useGetCandidatesInReviewQuery
+    useGetCandidatesInReviewQuery,
+    useGetCandidateByIdQuery
 } = candidatesApi; 
