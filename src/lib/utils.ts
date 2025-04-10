@@ -7,7 +7,7 @@ import utc from 'dayjs/plugin/utc';
 dayjs.extend(localizedFormat);
 dayjs.extend(utc); 
 
-export function cn(...inputs: ClassValue[]): string {
+export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 /**

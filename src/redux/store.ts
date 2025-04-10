@@ -5,6 +5,7 @@ import { fileManagementApi } from "./api/fileManagmentAPI";
 import { authManagementApi } from "./api/authManagementAPI";
 import { rolesApi } from "./api/rolesAPI";
 import { appAPI } from "./api/appAPI";
+import { candidatesApi } from "./api/candidatesApi";
 // Infer the `RootState` type from the root reducer
 export type RootState = ReturnType<typeof rootReducer>;
 
@@ -14,6 +15,7 @@ const apiMiddlewares = [
   authManagementApi.middleware,
   rolesApi.middleware,
   appAPI.middleware,
+  candidatesApi.middleware,
 ];
 
 // `makeStore` encapsulates the store configuration to allow
