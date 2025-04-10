@@ -1,47 +1,45 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { DataTable } from '@/components/molecules/DataTable/DataTable';
-import { ColumnDef, SortingState, PaginationState } from '@tanstack/react-table';
+import { ColumnDef, SortingState, PaginationState, RowSelectionState } from '@tanstack/react-table';
 import { Eye, Pencil, Trash } from 'lucide-react';
 import { Button } from '@/components/atoms/Button';
-import { Candidate } from '@/types/candidate';
+import { Candidate, useGetCandidatesInReviewQuery } from '@/redux/api/candidatesApi';
 
 function CandidatesInReview() {
-  const [candidates, setCandidates] = useState<Candidate[]>([]);
-  const [loading, setLoading] = useState(true);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
-  useEffect(() => {
-    // TODO: Fetch candidates with REVIEWING status
-    // This is a placeholder for the actual API call
-    const fetchCandidates = async () => {
-      try {
-        // const response = await fetch('/api/candidates?status=REVIEWING');
-        // const data = await response.json();
-        // setCandidates(data);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching candidates:', error);
-        setLoading(false);
-      }
-    };
+  const { data, isLoading, error } = useGetCandidatesInReviewQuery({
+    status: 'REVIEWING,PROCESSING',
+    page: pagination.pageIndex + 1, // API uses 1-based pagination
+    limit: pagination.pageSize,
+  });
 
-    fetchCandidates();
-  }, []);
+  const candidates = data?.data?.candidates || [];
+  const totalCount = data?.data?.total || 0;
 
   const columns: ColumnDef<Candidate>[] = [
     {
-      accessorKey: 'name',
-      header: 'Name',
+      accessorKey: 'firstName',
+      header: 'First Name',
+    },
+    {
+      accessorKey: 'lastName',
+      header: 'Last Name',
     },
     {
       accessorKey: 'email',
       header: 'Email',
+    },
+    {
+      accessorKey: 'phone',
+      header: 'Phone',
     },
     {
       accessorKey: 'status',
@@ -81,8 +79,12 @@ function CandidatesInReview() {
     },
   ];
 
-  if (loading) {
+  if (isLoading) {
     return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error loading candidates</div>;
   }
 
   if (candidates.length === 0) {
@@ -95,12 +97,15 @@ function CandidatesInReview() {
       <DataTable
         data={candidates}
         columns={columns}
-        totalCount={candidates.length}
-        loading={loading}
+        totalCount={totalCount}
+        loading={isLoading}
         sorting={sorting}
         pagination={pagination}
         onSortingChange={setSorting}
         onPaginationChange={setPagination}
+        rowSelection={rowSelection}
+        onRowSelectionChange={setRowSelection}
+        enableRowSelection={true}
       />
     </section>
   );
