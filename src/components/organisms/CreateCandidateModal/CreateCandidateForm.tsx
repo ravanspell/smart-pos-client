@@ -45,7 +45,11 @@ export function CreateCandidateForm({ onClose }: CreateCandidateFormProps) {
       ));
       console.log("uploadCVRequests", uploadCVRequests);
       await uploadCV(uploadCVRequests).unwrap();
-      toast.success('Files uploaded successfully');
+      toast.success('Files uploaded successfully', {
+        position: 'top-center',
+        description: 'Candidates will be reviewed shortly',
+        duration: 5000,
+      });
       onClose();
     } catch (error) {
       console.error('Error uploading files:', error);

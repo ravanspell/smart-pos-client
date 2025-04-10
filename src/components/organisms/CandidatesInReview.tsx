@@ -1,28 +1,52 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DataTable } from '@/components/molecules/DataTable/DataTable';
 import { ColumnDef, SortingState, PaginationState, RowSelectionState } from '@tanstack/react-table';
 import { Eye, Pencil, Trash } from 'lucide-react';
 import { Button } from '@/components/atoms/Button';
 import { Candidate, useGetCandidatesInReviewQuery } from '@/redux/api/candidatesApi';
 
+const POLLING_INTERVAL = 4000;
+const PAGE_SIZE = 10;
+const PAGE_INDEX = 1;
+
+const CANDIDATES_STATUS = {
+  REVIEWING: 'REVIEWING',
+  PROCESSING: 'PROCESSING',
+}
+
 function CandidatesInReview() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
+    pageIndex: PAGE_INDEX,
+    pageSize: PAGE_SIZE,
   });
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [shouldPoll, setShouldPoll] = useState(false);
 
   const { data, isLoading, error } = useGetCandidatesInReviewQuery({
-    status: 'REVIEWING,PROCESSING',
-    page: pagination.pageIndex + 1, // API uses 1-based pagination
+    status: `${CANDIDATES_STATUS.REVIEWING},${CANDIDATES_STATUS.PROCESSING}`,
+    page: pagination.pageIndex + 1,
     limit: pagination.pageSize,
+  }, {
+    pollingInterval: shouldPoll ? POLLING_INTERVAL : 0, // Poll every 4 seconds when shouldPoll is true
   });
 
   const candidates = data?.data?.candidates || [];
   const totalCount = data?.data?.total || 0;
+
+  // Check if any candidate has 'PROCESSING' status
+  useEffect(() => {
+    if (candidates.length > 0) {
+      const hasProcessingCandidates = candidates.some(
+        candidate => candidate.status === CANDIDATES_STATUS.PROCESSING
+      );
+      setShouldPoll(hasProcessingCandidates);
+    } else {
+      setShouldPoll(false);
+    }
+  }, [candidates]);
 
   const columns: ColumnDef<Candidate>[] = [
     {
@@ -44,6 +68,19 @@ function CandidatesInReview() {
     {
       accessorKey: 'status',
       header: 'Status',
+      cell: ({ row }) => {
+        const status = row.original.status;
+        return (
+          <div className={`flex items-center gap-1 ${
+            status === CANDIDATES_STATUS.PROCESSING ? 'text-amber-500' : 'text-green-500'
+          }`}>
+            {status === CANDIDATES_STATUS.PROCESSING && (
+              <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+            )}
+            {status}
+          </div>
+        );
+      },
     },
     {
       id: 'actions',
@@ -79,7 +116,7 @@ function CandidatesInReview() {
     },
   ];
 
-  if (isLoading) {
+  if (isLoading && candidates.length === 0) {
     return <div>Loading...</div>;
   }
 
@@ -93,7 +130,9 @@ function CandidatesInReview() {
 
   return (
     <section>
-      <h2 className="text-xl font-semibold mb-4">Candidates in Review</h2>
+      <h2 className="text-xl font-semibold mb-4">
+        Candidates in Review
+      </h2>
       <DataTable
         data={candidates}
         columns={columns}

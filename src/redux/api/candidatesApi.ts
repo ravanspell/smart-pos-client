@@ -61,8 +61,9 @@ export const candidatesApi = createApi({
             query: (data) => ({
                 url: CANDIDATES.CREATE_CANDIDATE,
                 method: HTTPMethod.POST,
-                body: { createFileData: data },
+                body: { resumeFiles: data },
             }),
+            // force to refetch review candidates when a new candidate is uploaded
             invalidatesTags: candidateInvalidateTags,
         }),
         getCandidatesInReview: builder.query<CandidatesResponse, GetCandidatesParams>({
