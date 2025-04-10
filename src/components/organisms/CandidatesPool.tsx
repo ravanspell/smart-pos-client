@@ -19,7 +19,7 @@ function CandidatesPool() {
 
   useEffect(() => {
     // Dummy data for candidates
-    const dummyCandidates: Candidate[] = [
+    const dummyCandidates: any[] = [
       {
         id: '1',
         name: 'John Smith',

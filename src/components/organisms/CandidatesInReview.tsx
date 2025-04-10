@@ -6,10 +6,11 @@ import { ColumnDef, SortingState, PaginationState, RowSelectionState } from '@ta
 import { Eye, Pencil, Trash } from 'lucide-react';
 import { Button } from '@/components/atoms/Button';
 import { Candidate, useGetCandidatesInReviewQuery } from '@/redux/api/candidatesApi';
+import { useRouter } from 'next/navigation';
 
 const POLLING_INTERVAL = 4000;
 const PAGE_SIZE = 10;
-const PAGE_INDEX = 1;
+const PAGE_INDEX = 0;
 
 const CANDIDATES_STATUS = {
   REVIEWING: 'REVIEWING',
@@ -24,7 +25,7 @@ function CandidatesInReview() {
   });
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [shouldPoll, setShouldPoll] = useState(false);
-
+  const router = useRouter();
   const { data, isLoading, error } = useGetCandidatesInReviewQuery({
     status: `${CANDIDATES_STATUS.REVIEWING},${CANDIDATES_STATUS.PROCESSING}`,
     page: pagination.pageIndex + 1,
@@ -92,7 +93,9 @@ function CandidatesInReview() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => {/* TODO: Implement view */}}
+              onClick={() => {
+                router.push(`/dashboard/candidates/details?id=${candidate.id}`);
+              }}
             >
               <Eye className="w-4 h-4" />
             </Button>
