@@ -2,7 +2,7 @@
 
 import { UserNav } from './userNav';
 import { ThemeToggle } from '@/components/utilComponents/theme-toggle';
-import { Notifications } from './notifications';
+import Notifications from './notifications';
 import { SidebarTrigger } from '@/components/molecules/SideBar';
 import { Separator } from '@/components/ui/separator';
 import BreadcrumbComponent from '@/components/molecules/Breadcrumb';
