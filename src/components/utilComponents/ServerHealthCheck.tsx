@@ -44,7 +44,7 @@ export default function ServerHealthCheck({ children }: Props) {
                 updateActivity().catch(error => {
                     console.error('Failed to update activity:', error);
                 });
-            }, 10 * 60 * 1000); // 10 minutes in milliseconds
+            }, 5 * 60 * 1000); // 5 minutes in milliseconds
         }
         // Clean up interval on component unmount
         return () => {
