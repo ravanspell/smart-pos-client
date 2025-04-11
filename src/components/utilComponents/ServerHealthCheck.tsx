@@ -1,39 +1,59 @@
 import { ReactNode, useEffect, useState } from "react";
-import { useHealthCheckQuery, useWakeupMutation } from "@/redux/api/appAPI";
+import { useWakeupCheckQuery, useUpdateActivityMutation } from "@/redux/api/appAPI";
 
 interface Props {
     children: ReactNode;
 }
 
+const POLLING_INTERVAL = 5000;
+const OK_STATUS = 'ok';
+
+/**
+ * Component that:
+ * 1. Polls the wakeup check endpoint until the server is ready
+ * 2. Periodically sends activity updates to the server to keep the server awake
+ * 
+ * this is to prevent the server from sleeping due to inactivity
+ * !dev envirment only
+ */
 export default function ServerHealthCheck({ children }: Props) {
     const [shouldPoll, setShouldPoll] = useState(true);
-    const [wakeup] = useWakeupMutation();
-    const { data: healthData, refetch, error: healthError } = useHealthCheckQuery(undefined, {
-        pollingInterval: shouldPoll ? 5000 : 0,
+    const { data, error } = useWakeupCheckQuery(undefined, {
+        skip: process.env.NEXT_PUBLIC_ENV === 'local',
+        pollingInterval: shouldPoll ? POLLING_INTERVAL : 0,
     });
-    
-    const checkHealth = async (): Promise<void> => {
-        try {
-            // If we have health data and it's successful, stop polling
-            if (healthData?.success && healthData.data.status === 'ok') {
-                setShouldPoll(false);
-                return;
-            } else if (healthError) {
-                // If we have an error or no successful health data, try to wake up
-                await wakeup().unwrap();
-                // After wakeup, refetch health check
-                refetch();
-            }
-        } catch (error) {
-            console.error('Failed to wake up server:', error);
-        }
-    };
+    const [updateActivity] = useUpdateActivityMutation();
 
+    // Handle wakeup check polling
     useEffect(() => {
-        checkHealth();
-    }, [healthData]);
+        // If we have data and the status is 'ok', stop polling
+        if (data?.status === OK_STATUS) {
+            setShouldPoll(false);
+        }
+    }, [data]);
 
-    if (!healthData?.success || healthData.data.status !== 'ok') {
+    // Handle periodic activity updates
+    useEffect(() => {
+        let intervalId: NodeJS.Timeout;
+        if (data?.status === OK_STATUS && process.env.NEXT_PUBLIC_ENV !== 'local') {
+            updateActivity().catch(error => {
+                console.error('Failed to update activity:', error);
+            });
+            // Set up interval for periodic calls (every 10 minutes)
+            intervalId = setInterval(() => {
+                updateActivity().catch(error => {
+                    console.error('Failed to update activity:', error);
+                });
+            }, 10 * 60 * 1000); // 10 minutes in milliseconds
+        }
+        // Clean up interval on component unmount
+        return () => {
+            clearInterval(intervalId);
+        };
+    }, [data]);
+
+    // If we have an error or the server is not ready, show loading state
+    if (error || data?.status !== OK_STATUS && process.env.NEXT_PUBLIC_ENV !== 'local') {
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="text-center">

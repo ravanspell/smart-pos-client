@@ -4,37 +4,32 @@ import { APP } from '@/constants/api';
 import HTTPMethod from 'http-method-enum';
 import { ApiResponse } from './types/file-mgt';
 
-interface HealthCheckResponse extends ApiResponse<{
-    status: string;
-    info: {
-        database: {
-            status: string;
-        };
-    };
-    error: Record<string, any>;
-    details: {
-        database: {
-            status: string;
-        };
-    };
-}> { }
+interface WakeupCheckResponse {
+    status: 'pending' | 'ok';
+}
 
-interface WakeupResponse extends ApiResponse<any> { }
+interface UpdateActivityResponse extends ApiResponse<any> { }
 
 export const appAPI = createApi({
     reducerPath: 'appAPI',
     baseQuery: baseQuery,
     endpoints: (builder) => ({
-        healthCheck: builder.query<HealthCheckResponse, void>({
-            query: () => APP.HEALTH_CHECK,
-        }),
-        wakeup: builder.mutation<WakeupResponse, void>({
+        wakeupCheck: builder.query<WakeupCheckResponse, void>({
             query: () => ({
                 url: APP.WAKEUP,
+                method: HTTPMethod.GET,
+            }),
+        }),
+        updateActivity: builder.mutation<UpdateActivityResponse, void>({
+            query: () => ({
+                url: APP.UPDATE_ACTIVITY,
                 method: HTTPMethod.POST,
             }),
         }),
     }),
 });
 
-export const { useHealthCheckQuery, useWakeupMutation } = appAPI; 
+export const {
+    useWakeupCheckQuery,
+    useUpdateActivityMutation 
+} = appAPI; 

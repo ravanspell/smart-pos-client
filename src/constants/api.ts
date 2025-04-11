@@ -16,8 +16,8 @@ export const FILE_MGT = {
 }
 
 export const APP = {
-    HEALTH_CHECK: 'app/health-check',
-    WAKEUP: 'app/wakeup'
+    WAKEUP: 'https://nrxdjpywxpxlb2eimjiakcsv640fdrrc.lambda-url.ap-southeast-1.on.aws/',
+    UPDATE_ACTIVITY: 'app/update-activity'
 }
 
 export const CANDIDATES = {
