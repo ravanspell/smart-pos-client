@@ -19,6 +19,7 @@ const OK_STATUS = 'ok';
 export default function ServerHealthCheck({ children }: Props) {
     const [shouldPoll, setShouldPoll] = useState(true);
     const { data, error } = useWakeupCheckQuery(undefined, {
+        skip: process.env.NEXT_PUBLIC_ENV === 'local',
         pollingInterval: shouldPoll ? POLLING_INTERVAL : 0,
     });
     const [updateActivity] = useUpdateActivityMutation();
@@ -34,7 +35,7 @@ export default function ServerHealthCheck({ children }: Props) {
     // Handle periodic activity updates
     useEffect(() => {
         let intervalId: NodeJS.Timeout;
-        if (data?.status === OK_STATUS) {
+        if (data?.status === OK_STATUS && process.env.NEXT_PUBLIC_ENV !== 'local') {
             updateActivity().catch(error => {
                 console.error('Failed to update activity:', error);
             });
@@ -52,7 +53,7 @@ export default function ServerHealthCheck({ children }: Props) {
     }, [data]);
 
     // If we have an error or the server is not ready, show loading state
-    if (error || data?.status !== OK_STATUS) {
+    if (error || data?.status !== OK_STATUS && process.env.NEXT_PUBLIC_ENV !== 'local') {
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="text-center">
