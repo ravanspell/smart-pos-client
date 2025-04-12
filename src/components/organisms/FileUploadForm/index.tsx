@@ -109,10 +109,9 @@ const FileUploadForm = ({
                 <FormFileUploader
                   files={field.value}
                   onChange={(files) => {
-                    console.log("files", files);
                     field.onChange(files)
                   }}
-                  accept="image/*"
+                  accept="*"
                   maxSize={1024 * 1024 * 1024 * 2} // 2GB
                   maxFileCount={20}
                   multiple={true}
