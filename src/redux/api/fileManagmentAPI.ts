@@ -24,7 +24,7 @@ export interface BreadcrumbResponse {
 export const fileManagementApi = createApi({
     reducerPath: 'fileManagementApi',
     baseQuery: baseQuery,
-    tagTypes: ['Folder', 'File'],
+    tagTypes: ['Folder', 'File', 'StorageInfo'],
     endpoints: (builder) => ({
         // ** Get Folder's and it's contents **
         getFolderContents: builder.query<
@@ -151,13 +151,17 @@ export const fileManagementApi = createApi({
                 // Get unique parent folder IDs
                 const parentFolders = [...new Set(files.map(file => file.parentId))];
                 // Return tags for each parent folder
-                return parentFolders.map(parentId => ({ type: 'Folder', id: parentId || 'ROOT' }));
+                return [
+                    ...parentFolders.map(parentId => ({ type: 'Folder' as const, id: parentId || 'ROOT' })),
+                    { type: 'StorageInfo' as const }
+                ];
             },
         }),
         // **Get Storage Info**
         getStorageInfo: builder.query<ApiResponse<StorageInfo>, void>({
             query: () => FILE_MGT.GET_STORAGE_INFO,
             transformResponse: (response: ApiResponse<StorageInfo>) => response,
+            providesTags: [{ type: 'StorageInfo' as const }],
         }),
     }),
 });
