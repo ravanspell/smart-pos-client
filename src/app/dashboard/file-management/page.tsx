@@ -89,22 +89,7 @@ const FileFolderGrid: React.FC = () => {
         pageSize: 10
     })
 
-
-    const [files, setFiles] = useState<FileItem[]>([
-        { id: "1", name: "Unicode", isFolder: true, date: "Sep 13, 2013", user: "by ireshan madawa", size: "1 File" },
-        { id: "2", name: "Sinhala Fonts", isFolder: true, date: "Sep 26, 2013", user: "by ireshan madawa", size: "33 Files" },
-        { id: "3", name: "python for Android", isFolder: true, date: "Nov 9, 2013", user: "by ireshan madawa", size: "1 File" },
-        { id: "4", name: "SL4A", isFolder: true, date: "Nov 9, 2013", user: "by ireshan madawa", size: "1 File" },
-        { id: "5", name: "diskdigger", isFolder: true, date: "Nov 26, 2013", user: "by ireshan madawa", size: "1 File" },
-        { id: "6", name: "AL ICT (ireshan)", isFolder: true, date: "Nov 26, 2013", user: "by ireshan madawa", size: "3 Files" },
-        { id: "7", name: "pythonCGIex", isFolder: true, date: "Dec 5, 2013", user: "by ireshan madawa", size: "2 Files" },
-        { id: "8", name: "Miniclip.com", isFolder: true, date: "Jan 21, 2014", user: "by ireshan madawa", size: "1 File" },
-        { id: "9", name: "SmartDustbin", isFolder: true, date: "Feb 2, 2018", user: "by ireshan madawa", size: "1 File" },
-    ]);
-
     const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
-    const [sortColumn, setSortColumn] = useState<string>("name");
-    const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
     const [isOpenCreateFolderModal, setIsOpenCreateFolderModal] = useState<boolean>(false);
     const [isOpenFileUploaderModal, setIsOpenFileUploaderModal] = useState<boolean>(false);
 
@@ -131,33 +116,10 @@ const FileFolderGrid: React.FC = () => {
         }
     };
 
-    const handleRename = (item: FileItem) => {
-        const newName = prompt(`Rename ${item.name} to:`, item.name);
-        if (newName) {
-            setFiles((prev) =>
-                prev.map((file) => (file.id === item.id ? { ...file, name: newName } : file))
-            );
-        }
-    };
-
     const isItemSelected = (id: string) => selectedFiles.includes(id);
 
     // Sorting logic
-    const handleSort = (column: string) => {
-        const newDirection = sortColumn === column && sortDirection === "asc" ? "desc" : "asc";
-        setSortColumn(column);
-        setSortDirection(newDirection);
-
-        const sortedFiles = [...files].sort((a, b) => {
-            if (newDirection === "asc") {
-                return a[column as keyof FileItem] > b[column as keyof FileItem] ? 1 : -1;
-            } else {
-                return a[column as keyof FileItem] < b[column as keyof FileItem] ? 1 : -1;
-            }
-        });
-
-        setFiles(sortedFiles);
-    };
+    const handleSort = (column: string) => {};
 
     const goToFolder = (entity: FileOrFolder) => {
         if (entity.folder) {
@@ -230,10 +192,10 @@ const FileFolderGrid: React.FC = () => {
                 <TableHeader>
                     <TableRow>
                         <TableHead className="cursor-pointer" onClick={() => handleSort("name")}>
-                            NAME {sortColumn === "name" && (sortDirection === "asc" ? "↑" : "↓")}
+                            NAME
                         </TableHead>
                         <TableHead className="cursor-pointer" onClick={() => handleSort("date")}>
-                            UPDATED {sortColumn === "date" && (sortDirection === "asc" ? "↑" : "↓")}
+                            UPDATED
                         </TableHead>
                         <TableHead >
                             SIZE
