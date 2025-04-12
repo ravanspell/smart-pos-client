@@ -17,6 +17,7 @@ import { Input } from '@/components/atoms/Input';
 import { fetchToken } from '@/lib/firebaseClient';
 import { DASHBOARD_ROUTE } from '@/constants/routes';
 import Turnstile from '@/components/Turnstile';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 
 // Define Zod schema for validation
 const loginSchema = z.object({
@@ -33,6 +34,7 @@ const LoginFormComponent: React.FC = () => {
     const [login] = useLoginMutation();
     const [isLoginInProgress, setIsLoginInProgress] = useState(false);
     const router = useRouter();
+    const { handleError } = useErrorHandler();
 
     // Initialize react-hook-form with Shadcn Form
     const form = useForm<LoginFormInputs>({
@@ -58,8 +60,6 @@ const LoginFormComponent: React.FC = () => {
             console.info("This browser does not support desktop notification");
             return null;
         }
-        console.log("Notification.permission--->", Notification.permission);
-
         // Step 2: If permission granted, generate FCM token
         if (Notification.permission === "granted") {
             return await fetchToken();
@@ -88,7 +88,7 @@ const LoginFormComponent: React.FC = () => {
             router.push(DASHBOARD_ROUTE);
         } catch (error) {
             setIsLoginInProgress(false);
-            console.error('Login error:', error);
+            handleError(error);
         }
     };
 

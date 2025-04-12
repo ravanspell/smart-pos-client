@@ -1,5 +1,4 @@
 import { ErrorType } from '@/constants';
-import { IconEnum } from '@/lib/icons';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 
@@ -15,20 +14,11 @@ export type ErrorState = {
   icon?: '';
 };
 
-export type ToastState = {
-  display: boolean;
-  message: string;
-  type: string;
-  icon?: any;
-};
-
-
 type AppState = {
   theme: 'light' | 'dark';
   notifications: string[];
   breadcrumbs: Breadcrumb[];
   errors: Record<string, ErrorState>;
-  toast: ToastState;
 };
 
 const initialState: AppState = {
@@ -36,12 +26,6 @@ const initialState: AppState = {
   notifications: [],
   breadcrumbs: [],
   errors: {},
-  toast: {
-    display: false,
-    type: 'success',
-    message: '',
-    icon: IconEnum.circleCheckIcon,
-  }
 };
 
 export const appSlice = createSlice({
@@ -109,26 +93,6 @@ export const appSlice = createSlice({
       const { sectionId } = action.payload;
       delete state.errors[sectionId];
     },
-    /**
-     * Action to show a toast notification.
-     * @param state - The current state of the application.
-     * @param action - Contains `message` and `type` for the toast.
-     */
-    showToast(state, action: PayloadAction<Omit<ToastState, 'display'>>) {
-      state.toast = {
-        ...state.toast,
-        ...action.payload,
-        display: true,
-      };
-    },
-
-    /**
-     * Action to clear the current toast notification.
-     * @param state - The current state of the application.
-     */
-    clearToast(state) {
-      state.toast = initialState.toast;
-    },
   },
   selectors: {
     /**
@@ -152,12 +116,6 @@ export const appSlice = createSlice({
      */
     getBreadcrumbs: (app: AppState) => app.breadcrumbs,
     getSectionError: (app: AppState, errorId: string) => app.errors[errorId],
-    /**
-     * Selector to get the current toast notification.
-     * @param app - The current state of the application.
-     * @returns The current toast notification or null.
-     */
-    getToast: (app: AppState) => app.toast,
   },
 });
 
@@ -172,8 +130,6 @@ export const {
   clearBreadcrumbs,
   setError,
   clearError,
-  clearToast,
-  showToast
 } = appSlice.actions;
 
 /**
@@ -183,7 +139,6 @@ export const {
   getBreadcrumbs,
   getNotifications,
   getSectionError,
-  getToast,
 } = appSlice.selectors;
 
 /**

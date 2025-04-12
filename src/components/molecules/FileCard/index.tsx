@@ -7,6 +7,7 @@ import { UploadFile } from "@/components/molecules/FormFileUploader"
 import { useUpload } from "@/hooks/useUpload"
 import { Progress } from "@/components/atoms/Progress"
 import { Button } from "@/components/atoms/Button"
+import { useErrorHandler } from "@/hooks/useErrorHandler"
 
 interface FileCardProps {
   /**
@@ -41,6 +42,7 @@ interface FileCardProps {
 const UPLOAD_COMPLETED = 100 // 100%
 
 const FileCard = ({ file, fileIndex, onRemove, setFiles }: FileCardProps) => {
+  const { handleError } = useErrorHandler();
   // Use a ref to track whether we've already started the upload for this file
   const uploadStartedRef = useRef(false);
   // Track if the file has an error
@@ -74,11 +76,19 @@ const FileCard = ({ file, fileIndex, onRemove, setFiles }: FileCardProps) => {
     },
   })
 
+  const handleUpload = () => {
+    try { 
+      uploadFile(file);
+    } catch (error) {
+      handleError(error);
+    }
+  }
+
   useEffect(() => {
     // Start upload when component mounts, but only if we haven't started it yet
     if (!file.s3ObjectKey && !uploadStartedRef.current) {
       uploadStartedRef.current = true;
-      uploadFile(file).catch(console.error);
+      handleUpload();
     }
   }, []);
 
@@ -86,7 +96,7 @@ const FileCard = ({ file, fileIndex, onRemove, setFiles }: FileCardProps) => {
   const handleRetry = () => {
     setHasError(false);
     uploadStartedRef.current = false;
-    uploadFile(file).catch(console.error);
+    handleUpload();
   };
 
   return (
