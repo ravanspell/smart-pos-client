@@ -13,7 +13,8 @@ import {
     DownloadIcon,
     PlusIcon,
     ShareIcon,
-    TrashIcon
+    TrashIcon,
+    HardDrive
 } from "lucide-react";
 import { Button } from "@/components/atoms/Button";
 import { Checkbox } from "@/components/atoms/CheckBox";
@@ -37,7 +38,8 @@ import { Icons } from "@/lib/icons";
 import FileIcon from "@/components/molecules/FileIcons";
 import FileUploadModal from "@/components/organisms/FileUploadModal";
 import { useBreadcrumb } from "@/hooks/useBreadcrumb";
-
+import { FILE_MANAGEMENT_ROUTE } from "@/constants/routes";
+import { Progress } from "@/components/atoms/Progress";
 interface FileItem {
     id: string;
     name: string;
@@ -152,7 +154,7 @@ const FileFolderGrid: React.FC = () => {
 
     const goToFolder = (entity: FileOrFolder) => {
         if (entity.folder) {
-            router.push(`/dashboard/file-management?folderId=${entity.id}`);
+            router.push(`${FILE_MANAGEMENT_ROUTE}?folderId=${entity.id}`);
         }
     };
 
@@ -161,14 +163,15 @@ const FileFolderGrid: React.FC = () => {
             {/* Switch between grid and list view */}
             {selectedFiles.length === 0 && (
                 <div className="flex justify-between items-center mb-4">
-                    {/* <div className="flex gap-2">
-                        <BreadcrumbComponent
-                            items={[
-                                { label: "My files", href: "/dashboard/file-management" },
-                                ...folderId ? bc : []
-                            ]}
-                        />
-                    </div> */}
+                    <div >
+                        <div className="flex items-center gap-2">
+                            <HardDrive size={15} />
+                            <span className="text-sm">200.1 MB of 10.0 GB used</span>
+                        </div>
+                        <div className="w-64">
+                            <Progress className="h-2 w-full" value={50} />
+                        </div>
+                    </div>
                     <div className="space-x-2">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
