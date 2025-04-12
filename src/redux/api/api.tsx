@@ -1,11 +1,12 @@
 import { fetchBaseQuery, FetchBaseQueryError, retry } from '@reduxjs/toolkit/query/react';
 import { StatusCodes } from 'http-status-codes';
+import { MAX_RETRIES } from '@/constants';
 /**
  * Retry condition for the RTK API
  * Skips retries for authentication errors and not found errors
  * Retries other errors (network issues, 500s, etc.)
  */
-const retryCondition = (error: FetchBaseQueryError, _args: any) => {
+const retryCondition = (error: FetchBaseQueryError, _args: any, retryCount: number) => {
     // Skip retry for authentication errors
     if ('status' in error) {
         if (error.status === StatusCodes.UNAUTHORIZED || error.status === StatusCodes.FORBIDDEN) {
@@ -16,8 +17,8 @@ const retryCondition = (error: FetchBaseQueryError, _args: any) => {
             return false;
         }
     }
-    // Retry other errors (network issues, 500s, etc.)
-    return true;
+    // Retry other errors (network issues, 500s, etc.) but only up to maxRetries
+    return retryCount < MAX_RETRIES;
 }
 
 /**
@@ -32,5 +33,4 @@ export const baseQuery = retry(fetchBaseQuery({
     },
 }), {
     retryCondition: retryCondition as any,
-    maxRetries: 5 // default 5
 });

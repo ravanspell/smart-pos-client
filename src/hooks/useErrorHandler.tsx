@@ -19,7 +19,6 @@ import { useDispatch } from 'react-redux';
 import {
     setError,
     clearError as clearErrorAction,
-    showToast
 } from '@/redux/slices/appSlice';
 import {
     DEFAULT_ERROR_SECTION_ID,
@@ -30,11 +29,17 @@ import {
 import { LOGIN_ROUTE } from '@/constants/routes';
 import { IconEnum } from '@/lib/icons';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import { toast } from "sonner"
+
 
 interface ErrorOptions {
     layout?: ErrorLayoutType; // Optional, defaults to ERROR_LAYOUT_TYPES.TOAST
     sectionId?: string; // Optional, defaults to DEFAULT_ERROR_SECTION_ID
 }
+
+const TOAST_DURATION = 5000;
+const TOAST_POSITION = 'top-center';
+const TOAST_ERROR_ICON = IconEnum.circleAlert;
 
 export const useErrorHandler = () => {
     const dispatch = useDispatch();
@@ -66,11 +71,11 @@ export const useErrorHandler = () => {
         const layout = options.layout || ERROR_LAYOUT_TYPES.TOAST;
 
         if (layout === ERROR_LAYOUT_TYPES.TOAST) {
-            dispatch(showToast({
-                message,
-                type: 'error',
-                icon,
-            }));
+            toast.error(message, {
+                icon: icon || TOAST_ERROR_ICON,
+                duration: TOAST_DURATION,
+                position: TOAST_POSITION,
+            });
         } else {
             dispatch(setError({ sectionId, message, type }));
         }
@@ -126,13 +131,11 @@ export const useErrorHandler = () => {
                             );
 
                         case StatusCodes.UNAUTHORIZED:
-                            dispatch(
-                                showToast({
-                                    message: 'Session expired. Please login again.',
-                                    type: ERROR_TYPES.UNEXPECTED,
-                                    icon: IconEnum.keyIcon
-                                })
-                            );
+                            toast.error('Session expired. Please login again.', {
+                                icon: IconEnum.keyIcon,
+                                duration: TOAST_DURATION,
+                                position: TOAST_POSITION,
+                            });
                             const currentPath = window.location.pathname;
                             router.push(`${LOGIN_ROUTE}?returnUrl=${encodeURIComponent(currentPath)}`);
                             break;

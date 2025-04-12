@@ -14,7 +14,7 @@ import { Input } from '@/components/atoms/Input';
 import { useCreateFolderMutation } from '@/redux/api/fileManagmentAPI';
 import { useSearchParams } from 'next/navigation';
 import ModalActionButtons from '@/components/molecules/ModalActionButtons';
-
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 // Define the validation schema with zod
 const createFolderSchema = z.object({
     folderName: z.string().min(1, 'Folder name is required'),
@@ -31,10 +31,14 @@ const CreateFolderForm: FC<CreateFolderFormProps> = ({ onClose }) => {
     const params = useSearchParams()
     const parentFolderId = params.get('folderId') || '';
 
+    const { handleError } = useErrorHandler();
     const [createFolder, { isLoading }] = useCreateFolderMutation();
 
     const form = useForm<CreateFolderFormValues>({
         resolver: zodResolver(createFolderSchema),
+        defaultValues: {
+            folderName: ''
+        }
     });
 
     /**
@@ -49,7 +53,7 @@ const CreateFolderForm: FC<CreateFolderFormProps> = ({ onClose }) => {
             }).unwrap();
             onClose(); // Close modal after submission
         } catch (error) {
-            console.log("error---->", error);
+            handleError(error);
         }
     };
 

@@ -5,6 +5,7 @@ import FormFileUploader, { UploadFile } from '@/components/molecules/FormFileUpl
 import ModalActionButtons from '@/components/molecules/ModalActionButtons';
 import { UploadCVRequest, useUploadCVMutation } from '@/redux/api/candidatesApi';
 import { toast } from 'sonner';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 
 interface CreateCandidateFormProps {
   onClose: () => void;
@@ -16,6 +17,7 @@ const MAX_FILES = 50;
 
 export function CreateCandidateForm({ onClose }: CreateCandidateFormProps) {
   const [files, setFiles] = useState<UploadFile[]>([]);
+  const { handleError } = useErrorHandler();
   const [uploadCV] = useUploadCVMutation();
 
   const handleFileChange = (selectedFiles: UploadFile[] | ((prevFiles: UploadFile[]) => UploadFile[])) => {
@@ -52,8 +54,7 @@ export function CreateCandidateForm({ onClose }: CreateCandidateFormProps) {
       });
       onClose();
     } catch (error) {
-      console.error('Error uploading files:', error);
-      toast.error('Failed to upload files. Please try again.');
+      handleError(error);
     }
   };
 

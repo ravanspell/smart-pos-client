@@ -16,6 +16,7 @@ import FormFileUploader, {
 } from "@/components/molecules/FormFileUploader"
 import { useConfirmFileUploadMutation } from "@/redux/api/fileManagmentAPI"
 import ModalActionButtons from "../../molecules/ModalActionButtons"
+import { useErrorHandler } from "@/hooks/useErrorHandler";
 
 const formSchema = z.object({
   files: z
@@ -47,7 +48,7 @@ const FileUploadForm = ({
 }: FileUploadFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [confirmFileUpload, { isLoading }] = useConfirmFileUploadMutation()
-
+  const { handleError } = useErrorHandler();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -90,7 +91,7 @@ const FileUploadForm = ({
       // close the modal on success
       onCancel();
     } catch (error) {
-      console.error("Error uploading files:", error)
+      handleError(error);
     } finally {
       setIsSubmitting(false)
     }
@@ -108,10 +109,9 @@ const FileUploadForm = ({
                 <FormFileUploader
                   files={field.value}
                   onChange={(files) => {
-                    console.log("files", files);
                     field.onChange(files)
                   }}
-                  accept="image/*"
+                  accept="*"
                   maxSize={1024 * 1024 * 1024 * 2} // 2GB
                   maxFileCount={20}
                   multiple={true}

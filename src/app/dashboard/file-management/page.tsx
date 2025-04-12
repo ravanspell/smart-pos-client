@@ -13,7 +13,8 @@ import {
     DownloadIcon,
     PlusIcon,
     ShareIcon,
-    TrashIcon
+    TrashIcon,
+    HardDrive
 } from "lucide-react";
 import { Button } from "@/components/atoms/Button";
 import { Checkbox } from "@/components/atoms/CheckBox";
@@ -27,7 +28,8 @@ import {
 } from "@/components/atoms/Table";
 import {
     useGetBreadcrumbQuery,
-    useGetFolderContentsQuery
+    useGetFolderContentsQuery,
+    useGetStorageInfoQuery
 } from "@/redux/api/fileManagmentAPI";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FileOrFolder } from "@/redux/api/types/file-mgt";
@@ -37,7 +39,8 @@ import { Icons } from "@/lib/icons";
 import FileIcon from "@/components/molecules/FileIcons";
 import FileUploadModal from "@/components/organisms/FileUploadModal";
 import { useBreadcrumb } from "@/hooks/useBreadcrumb";
-
+import { FILE_MANAGEMENT_ROUTE } from "@/constants/routes";
+import { Progress } from "@/components/atoms/Progress";
 interface FileItem {
     id: string;
     name: string;
@@ -57,6 +60,12 @@ const FileFolderGrid: React.FC = () => {
         error,
         isLoading
     } = useGetBreadcrumbQuery(folderId);
+    
+    const {
+        data: storageInfo,
+        isLoading: storageInfoIsLoading
+    } = useGetStorageInfoQuery();
+    
     // map the breadcrumb list items
     const breadCrumbLinks = (breadcrumbs?.data?.parentFolderIds || []).map((breadcrumb) => ({
         label: breadcrumb.name,
@@ -80,22 +89,7 @@ const FileFolderGrid: React.FC = () => {
         pageSize: 10
     })
 
-
-    const [files, setFiles] = useState<FileItem[]>([
-        { id: "1", name: "Unicode", isFolder: true, date: "Sep 13, 2013", user: "by ireshan madawa", size: "1 File" },
-        { id: "2", name: "Sinhala Fonts", isFolder: true, date: "Sep 26, 2013", user: "by ireshan madawa", size: "33 Files" },
-        { id: "3", name: "python for Android", isFolder: true, date: "Nov 9, 2013", user: "by ireshan madawa", size: "1 File" },
-        { id: "4", name: "SL4A", isFolder: true, date: "Nov 9, 2013", user: "by ireshan madawa", size: "1 File" },
-        { id: "5", name: "diskdigger", isFolder: true, date: "Nov 26, 2013", user: "by ireshan madawa", size: "1 File" },
-        { id: "6", name: "AL ICT (ireshan)", isFolder: true, date: "Nov 26, 2013", user: "by ireshan madawa", size: "3 Files" },
-        { id: "7", name: "pythonCGIex", isFolder: true, date: "Dec 5, 2013", user: "by ireshan madawa", size: "2 Files" },
-        { id: "8", name: "Miniclip.com", isFolder: true, date: "Jan 21, 2014", user: "by ireshan madawa", size: "1 File" },
-        { id: "9", name: "SmartDustbin", isFolder: true, date: "Feb 2, 2018", user: "by ireshan madawa", size: "1 File" },
-    ]);
-
     const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
-    const [sortColumn, setSortColumn] = useState<string>("name");
-    const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
     const [isOpenCreateFolderModal, setIsOpenCreateFolderModal] = useState<boolean>(false);
     const [isOpenFileUploaderModal, setIsOpenFileUploaderModal] = useState<boolean>(false);
 
@@ -122,37 +116,14 @@ const FileFolderGrid: React.FC = () => {
         }
     };
 
-    const handleRename = (item: FileItem) => {
-        const newName = prompt(`Rename ${item.name} to:`, item.name);
-        if (newName) {
-            setFiles((prev) =>
-                prev.map((file) => (file.id === item.id ? { ...file, name: newName } : file))
-            );
-        }
-    };
-
     const isItemSelected = (id: string) => selectedFiles.includes(id);
 
     // Sorting logic
-    const handleSort = (column: string) => {
-        const newDirection = sortColumn === column && sortDirection === "asc" ? "desc" : "asc";
-        setSortColumn(column);
-        setSortDirection(newDirection);
-
-        const sortedFiles = [...files].sort((a, b) => {
-            if (newDirection === "asc") {
-                return a[column as keyof FileItem] > b[column as keyof FileItem] ? 1 : -1;
-            } else {
-                return a[column as keyof FileItem] < b[column as keyof FileItem] ? 1 : -1;
-            }
-        });
-
-        setFiles(sortedFiles);
-    };
+    const handleSort = (column: string) => {};
 
     const goToFolder = (entity: FileOrFolder) => {
         if (entity.folder) {
-            router.push(`/dashboard/file-management?folderId=${entity.id}`);
+            router.push(`${FILE_MANAGEMENT_ROUTE}?folderId=${entity.id}`);
         }
     };
 
@@ -161,14 +132,15 @@ const FileFolderGrid: React.FC = () => {
             {/* Switch between grid and list view */}
             {selectedFiles.length === 0 && (
                 <div className="flex justify-between items-center mb-4">
-                    {/* <div className="flex gap-2">
-                        <BreadcrumbComponent
-                            items={[
-                                { label: "My files", href: "/dashboard/file-management" },
-                                ...folderId ? bc : []
-                            ]}
-                        />
-                    </div> */}
+                    <div >
+                        <div className="flex items-center gap-2">
+                            <HardDrive size={15} />
+                            <span className="text-sm">{storageInfo?.data?.usedStorageFormatted || '0 MB'} of {storageInfo?.data?.allocatedStorageFormatted || '0 MB'} used</span>
+                        </div>
+                        <div className="w-64">
+                            <Progress className="h-2 w-full" value={storageInfo?.data?.usagePercentage || 0} />
+                        </div>
+                    </div>
                     <div className="space-x-2">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -220,10 +192,10 @@ const FileFolderGrid: React.FC = () => {
                 <TableHeader>
                     <TableRow>
                         <TableHead className="cursor-pointer" onClick={() => handleSort("name")}>
-                            NAME {sortColumn === "name" && (sortDirection === "asc" ? "↑" : "↓")}
+                            NAME
                         </TableHead>
                         <TableHead className="cursor-pointer" onClick={() => handleSort("date")}>
-                            UPDATED {sortColumn === "date" && (sortDirection === "asc" ? "↑" : "↓")}
+                            UPDATED
                         </TableHead>
                         <TableHead >
                             SIZE
