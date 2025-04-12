@@ -34,3 +34,11 @@ export interface GetFolderContentsResponse {
     filesAndFolders: FileOrFolder[];
     pagination: Pagination;
 }
+
+export interface StorageInfo {
+    allocatedStorage: string;
+    usedStorage: string;
+    usagePercentage: number;
+    allocatedStorageFormatted: string;
+    usedStorageFormatted: string;
+}

@@ -1,7 +1,12 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { baseQuery } from './api';
 import { HTTPMethod } from 'http-method-enum';
-import { ApiResponse, FileOrFolder, GetFolderContentsResponse } from './types/file-mgt';
+import { 
+    ApiResponse, 
+    FileOrFolder, 
+    GetFolderContentsResponse, 
+    StorageInfo 
+} from './types/file-mgt';
 import { FILE_MGT } from '@/constants/api';
 
 interface PresignedUrlResponse {
@@ -149,6 +154,11 @@ export const fileManagementApi = createApi({
                 return parentFolders.map(parentId => ({ type: 'Folder', id: parentId || 'ROOT' }));
             },
         }),
+        // **Get Storage Info**
+        getStorageInfo: builder.query<ApiResponse<StorageInfo>, void>({
+            query: () => FILE_MGT.GET_STORAGE_INFO,
+            transformResponse: (response: ApiResponse<StorageInfo>) => response,
+        }),
     }),
 });
 
@@ -160,4 +170,5 @@ export const {
     useGetBreadcrumbQuery,
     useGetPresignedUrlMutation,
     useConfirmFileUploadMutation,
+    useGetStorageInfoQuery,
 } = fileManagementApi;

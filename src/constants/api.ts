@@ -12,7 +12,9 @@ export const FILE_MGT = {
     RENAME_FILE: 'file-management/rename-file',
     RENAME_FOLDER: 'file-management/rename-folder',
     GET_FOLDER_CONTENTS: 'v1/file-management',
-    CONFIRM_UPLOAD: 'v1/file-management/upload/confirm'
+    CONFIRM_UPLOAD: 'v1/file-management/upload/confirm',
+    // TODO: should be under file mgt
+    GET_STORAGE_INFO: 'v1/organization/storage'
 }
 
 export const APP = {

@@ -28,7 +28,8 @@ import {
 } from "@/components/atoms/Table";
 import {
     useGetBreadcrumbQuery,
-    useGetFolderContentsQuery
+    useGetFolderContentsQuery,
+    useGetStorageInfoQuery
 } from "@/redux/api/fileManagmentAPI";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FileOrFolder } from "@/redux/api/types/file-mgt";
@@ -59,6 +60,12 @@ const FileFolderGrid: React.FC = () => {
         error,
         isLoading
     } = useGetBreadcrumbQuery(folderId);
+    
+    const {
+        data: storageInfo,
+        isLoading: storageInfoIsLoading
+    } = useGetStorageInfoQuery();
+    
     // map the breadcrumb list items
     const breadCrumbLinks = (breadcrumbs?.data?.parentFolderIds || []).map((breadcrumb) => ({
         label: breadcrumb.name,
@@ -166,10 +173,10 @@ const FileFolderGrid: React.FC = () => {
                     <div >
                         <div className="flex items-center gap-2">
                             <HardDrive size={15} />
-                            <span className="text-sm">200.1 MB of 10.0 GB used</span>
+                            <span className="text-sm">{storageInfo?.data?.usedStorageFormatted || '0 MB'} of {storageInfo?.data?.allocatedStorageFormatted || '0 MB'} used</span>
                         </div>
                         <div className="w-64">
-                            <Progress className="h-2 w-full" value={50} />
+                            <Progress className="h-2 w-full" value={storageInfo?.data?.usagePercentage || 0} />
                         </div>
                     </div>
                     <div className="space-x-2">
