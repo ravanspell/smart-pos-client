@@ -1,3 +1,7 @@
+
+//Max number of retries for the RTK API
+export const MAX_RETRIES = 5;
+
 // Default Error Section ID
 export const DEFAULT_ERROR_SECTION_ID = 'defaultError';
 
