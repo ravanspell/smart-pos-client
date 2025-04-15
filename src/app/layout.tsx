@@ -35,7 +35,7 @@ export default function RootLayout({ children }: Props) {
           <NotificationDisplay />
           <NextTopLoader showSpinner={false} />
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <Toaster />
+            <Toaster position="top-center" duration={4000} />
             <ServerHealthCheck>
               <Suspense fallback={<div>Loading...</div>}>
                 {children}
