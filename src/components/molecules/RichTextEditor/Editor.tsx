@@ -124,7 +124,7 @@ const Editor = forwardRef<any, EditorProps>(
 
     return (
       <div className={`editor-container ${className || ''}`}>
-        <div ref={containerRef} className="min-h-[200px]"></div>
+        <div ref={containerRef} ></div>
       </div>
     );
   }
