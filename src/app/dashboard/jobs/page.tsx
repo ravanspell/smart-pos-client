@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import { ArrowLeft, Pencil, Trash } from 'lucide-react';
 import { toast } from 'sonner';
 import { useDeleteJobMutation } from '@/redux/api/jobsApi';
+import { useBreadcrumb } from '@/hooks/useBreadcrumb';
 
 
 const JobDetailsPage = () => {
@@ -23,6 +24,16 @@ const JobDetailsPage = () => {
     skip: !jobId,
   });
   const [deleteJob] = useDeleteJobMutation();
+
+  useBreadcrumb([{
+    label: 'Jobs',
+    href: '/dashboard/jobs/list'
+  },
+  {
+    label: jobResponse?.data?.title || '',
+    href: ''
+  }
+  ]);
 
   const job = jobResponse?.data;
 
@@ -63,11 +74,7 @@ const JobDetailsPage = () => {
 
   return (
     <div className="container mx-auto py-8">
-      <div className="mb-6 flex items-center justify-between">
-        <Button variant="outline" onClick={() => router.push('/dashboard/jobs/list')}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Jobs
-        </Button>
+      <div className="mb-6 flex items-center justify-end">
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => router.push(`/dashboard/jobs/edit/${jobId}`)}>
             <Pencil className="mr-2 h-4 w-4" />
