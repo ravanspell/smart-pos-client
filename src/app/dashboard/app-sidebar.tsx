@@ -24,7 +24,7 @@ import {
     FILE_MANAGEMENT_ROUTE,
     DEFAULT_SETTINGS_ROUTE,
     CANDIDATES_ROUTE,
-    RECRUITMENT_ROUTE
+    JOBS_ROUTE
 } from "@/constants/routes"
 
 
@@ -52,7 +52,7 @@ const data = {
                 },
                 {
                     title: "Jobs",
-                    url: RECRUITMENT_ROUTE,
+                    url: JOBS_ROUTE,
                 },
             ],
         },
