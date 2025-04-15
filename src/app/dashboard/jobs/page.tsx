@@ -10,13 +10,17 @@ import { Input } from '@/components/atoms/Input';
 import Editor from '@/components/molecules/RichTextEditor/Editor';
 import { Switch } from '@/components/atoms/Switch';
 import { SubmitButton } from '@/components/molecules/SubmitButton';
+import { useCreateJobMutation } from '@/redux/api/jobsApi';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 
 // Define the Zod schema
 const jobFormSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.any().optional(),
-  salaryMin: z.number().optional(),
-  salaryMax: z.number().optional(),
+  salaryMin: z.string().default('0'),
+  salaryMax: z.string().default('0'),
   location: z.string().optional(),
   industry: z.string().optional(),
   isRemote: z.boolean().default(true),
@@ -25,13 +29,17 @@ const jobFormSchema = z.object({
 type JobFormValues = z.infer<typeof jobFormSchema>;
 
 const JobDashboard = () => {
+  const router = useRouter();
+  const { handleError } = useErrorHandler();
+  const [createJob, { isLoading }] = useCreateJobMutation();
+  
   const form = useForm<JobFormValues>({
     resolver: zodResolver(jobFormSchema),
     defaultValues: {
       title: '',
       description: {},
-      salaryMin: 0,
-      salaryMax: 0,
+      salaryMin: '0',
+      salaryMax: '0',
       location: '',
       industry: '',
       isRemote: true,
@@ -39,10 +47,23 @@ const JobDashboard = () => {
   });
 
   const onSubmit = async (data: JobFormValues): Promise<void> => {
-    console.log('Form Data:', data);
-    // Here you would typically send the data to your API
+    try {
+      // Format the description to match the API expected format
+      const formattedData = {
+        ...data,
+        description: data.description,
+        // Ensure salaryMin and salaryMax are always numbers
+        salaryMin: Number(data.salaryMin) || 0,
+        salaryMax: Number(data.salaryMax) || 0,
+      };
+      
+      await createJob(formattedData).unwrap();
+      toast.success('Job posting created successfully');
+    } catch (error) {
+      handleError(error);
+    }
   };
-
+  console.log(form.getValues());
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Create New Job Posting</h1>
@@ -62,9 +83,11 @@ const JobDashboard = () => {
               label="Minimum Salary"
             >
               <Input
-                type="number"
                 placeholder="Enter minimum salary"
-                onChange={(e) => form.setValue('salaryMin', Number(e.target.value))}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  form.setValue('salaryMin', value);
+                }}
               />
             </CustomFormField>
 
@@ -73,9 +96,12 @@ const JobDashboard = () => {
               label="Maximum Salary"
             >
               <Input
-                type="number"
+              
                 placeholder="Enter maximum salary"
-                onChange={(e) => form.setValue('salaryMax', Number(e.target.value))}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  form.setValue('salaryMax', value);
+                }}
               />
             </CustomFormField>
           </div>
@@ -127,6 +153,7 @@ const JobDashboard = () => {
             type="submit"
             className="w-full"
             label="Create Job Posting"
+            isLoading={isLoading}
           />
         </form>
       </Form>
