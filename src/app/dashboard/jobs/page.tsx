@@ -1,164 +1,164 @@
 "use client";
 
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Form } from '@/components/atoms/Form';
-import { CustomFormField } from '@/components/molecules/FormField';
-import { Input } from '@/components/atoms/Input';
-import Editor from '@/components/molecules/RichTextEditor/Editor';
-import { Switch } from '@/components/atoms/Switch';
-import { SubmitButton } from '@/components/molecules/SubmitButton';
-import { useCreateJobMutation } from '@/redux/api/jobsApi';
-import { toast } from 'sonner';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useErrorHandler } from '@/hooks/useErrorHandler';
+import { DataTable } from '@/components/molecules/DataTable/DataTable';
+import { ColumnDef, SortingState, PaginationState, RowSelectionState } from '@tanstack/react-table';
+import { Button } from '@/components/atoms/Button';
+import { PlusIcon, Eye, Pencil, Trash } from 'lucide-react';
+import { useGetJobsQuery } from '@/redux/api/jobsApi';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/atoms/Card';
+import { SortableColumnHeader } from '@/components/molecules/SortableColumnHeader';
 
-// Define the Zod schema
-const jobFormSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
-  description: z.any().optional(),
-  salaryMin: z.string().default('0'),
-  salaryMax: z.string().default('0'),
-  location: z.string().optional(),
-  industry: z.string().optional(),
-  isRemote: z.boolean().default(true),
-});
+// Define the job type for the table
+interface Job {
+  id: string;
+  title: string;
+  description: string;
+  salaryMin: number;
+  salaryMax: number;
+  location: string;
+  industry: string;
+  isRemote: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
-type JobFormValues = z.infer<typeof jobFormSchema>;
-
-const JobDashboard = () => {
+const JobsPage = () => {
   const router = useRouter();
-  const { handleError } = useErrorHandler();
-  const [createJob, { isLoading }] = useCreateJobMutation();
-  
-  const form = useForm<JobFormValues>({
-    resolver: zodResolver(jobFormSchema),
-    defaultValues: {
-      title: '',
-      description: {},
-      salaryMin: '0',
-      salaryMax: '0',
-      location: '',
-      industry: '',
-      isRemote: true,
-    },
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
   });
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
-  const onSubmit = async (data: JobFormValues): Promise<void> => {
-    try {
-      // Format the description to match the API expected format
-      const formattedData = {
-        ...data,
-        description: data.description,
-        // Ensure salaryMin and salaryMax are always numbers
-        salaryMin: Number(data.salaryMin) || 0,
-        salaryMax: Number(data.salaryMax) || 0,
-      };
-      
-      await createJob(formattedData).unwrap();
-      toast.success('Job posting created successfully');
-    } catch (error) {
-      handleError(error);
-    }
-  };
-  console.log(form.getValues());
-  return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Create New Job Posting</h1>
+  // Fetch jobs data
+  const { data, isLoading } = useGetJobsQuery({
+    page: pagination.pageIndex + 1,
+    limit: pagination.pageSize,
+  });
+console.log("data", data);
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <CustomFormField
-            name="title"
-            label="Job Title"
-          >
-            <Input placeholder="Enter job title" />
-          </CustomFormField>
+  // Extract jobs from the response
+  const jobs: Job[] = (data || []) as Job[];
+  const totalCount = jobs.length; // Since we don't have a total count in the response
 
-          <div className="grid grid-cols-2 gap-4">
-            <CustomFormField
-              name="salaryMin"
-              label="Minimum Salary"
+  // Define columns for the jobs table
+  const columns: ColumnDef<Job>[] = [
+    {
+      accessorKey: 'title',
+      header: ({ column }) => (
+        <SortableColumnHeader column={column} title="Job Title" />
+      ),
+    },
+    {
+      accessorKey: 'location',
+      header: ({ column }) => (
+        <SortableColumnHeader column={column} title="Location" />
+      ),
+    },
+    {
+      accessorKey: 'industry',
+      header: ({ column }) => (
+        <SortableColumnHeader column={column} title="Industry" />
+      ),
+    },
+    {
+      accessorKey: 'salaryMin',
+      header: ({ column }) => (
+        <SortableColumnHeader column={column} title="Min Salary" />
+      ),
+      cell: ({ row }) => {
+        const salary = row.getValue('salaryMin') as number;
+        return <span>${salary.toLocaleString()}</span>;
+      },
+    },
+    {
+      accessorKey: 'salaryMax',
+      header: ({ column }) => (
+        <SortableColumnHeader column={column} title="Max Salary" />
+      ),
+      cell: ({ row }) => {
+        const salary = row.getValue('salaryMax') as number;
+        return <span>${salary.toLocaleString()}</span>;
+      },
+    },
+    {
+      accessorKey: 'isRemote',
+      header: ({ column }) => (
+        <SortableColumnHeader column={column} title="Remote" />
+      ),
+      cell: ({ row }) => {
+        const isRemote = row.getValue('isRemote') as boolean;
+        return <span>{isRemote ? 'Yes' : 'No'}</span>;
+      },
+    },
+    {
+      id: 'actions',
+      header: 'Actions',
+      cell: ({ row }) => {
+        const job = row.original;
+        return (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.push(`/dashboard/jobs/${job.id}`)}
             >
-              <Input
-                placeholder="Enter minimum salary"
-                onChange={(e) => {
-                  const value = e.target.value;
-                  form.setValue('salaryMin', value);
-                }}
-              />
-            </CustomFormField>
-
-            <CustomFormField
-              name="salaryMax"
-              label="Maximum Salary"
+              <Eye className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.push(`/dashboard/jobs/edit/${job.id}`)}
             >
-              <Input
-              
-                placeholder="Enter maximum salary"
-                onChange={(e) => {
-                  const value = e.target.value;
-                  form.setValue('salaryMax', value);
-                }}
-              />
-            </CustomFormField>
-          </div>
-
-          <CustomFormField
-            name="location"
-            label="Location"
-          >
-            <Input placeholder="Enter job location" />
-          </CustomFormField>
-
-          <CustomFormField
-            name="industry"
-            label="Industry"
-          >
-            <Input placeholder="Enter industry" />
-          </CustomFormField>
-
-          <div className="flex items-center space-x-2">
-            <div>
-              <label
-                htmlFor="isRemote"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Remote Position
-              </label>
-            </div>
-            <Switch
-              id="isRemote"
-              name="isRemote"
-              checked={form.getValues('isRemote')}
-              onCheckedChange={(checked: boolean) => {
-                console.log('checked', checked);
-                form.setValue('isRemote', checked);
+              <Pencil className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                // Implement delete functionality
+                console.log('Delete job:', job.id);
               }}
-            />
+            >
+              <Trash className="w-4 h-4" />
+            </Button>
           </div>
-          <CustomFormField
-            name="description"
-            label="Job Description"
-          >
-            <Editor
-              defaultValue={form.getValues('description')}
-              onTextChange={(content) => form.setValue('description', content)}
-              placeholder="Enter job description..."
-            />
-          </CustomFormField>
-          <SubmitButton
-            type="submit"
-            className="w-full"
-            label="Create Job Posting"
-            isLoading={isLoading}
+        );
+      },
+    },
+  ];
+
+  return (
+    <div className="p-6">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Job Postings</CardTitle>
+          <Button onClick={() => router.push('/dashboard/jobs/create')}>
+            <PlusIcon className="w-4 h-4 mr-2" />
+            Create Job
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <DataTable
+            columns={columns}
+            data={jobs}
+            totalCount={totalCount}
+            sorting={sorting}
+            pagination={pagination}
+            onSortingChange={setSorting}
+            onPaginationChange={setPagination}
+            onRowSelectionChange={setRowSelection}
+            rowSelection={rowSelection}
+            loading={isLoading}
+            enableRowSelection={true}
           />
-        </form>
-      </Form>
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
-export default JobDashboard; 
+export default JobsPage; 
