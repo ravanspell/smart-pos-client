@@ -1,100 +1,135 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
-import { Button } from '@/components/atoms/Button';
-import 'react-quill/dist/quill.snow.css';
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Form } from '@/components/atoms/Form';
+import { CustomFormField } from '@/components/molecules/FormField';
+import { Input } from '@/components/atoms/Input';
 import Editor from '@/components/molecules/RichTextEditor/Editor';
-import Quill from 'quill';
+import { Switch } from '@/components/atoms/Switch';
+import { SubmitButton } from '@/components/molecules/SubmitButton';
 
-interface JobFormData {
-  title: string;
-  description: string;
-  requirements: string;
-}
+// Define the Zod schema
+const jobFormSchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  description: z.any().optional(),
+  salaryMin: z.number().optional(),
+  salaryMax: z.number().optional(),
+  location: z.string().optional(),
+  industry: z.string().optional(),
+  isRemote: z.boolean().default(true),
+});
+
+type JobFormValues = z.infer<typeof jobFormSchema>;
 
 const JobDashboard = () => {
-  const [formData, setFormData] = useState<JobFormData>({
-    title: '',
-    description: '',
-    requirements: '',
+  const form = useForm<JobFormValues>({
+    resolver: zodResolver(jobFormSchema),
+    defaultValues: {
+      title: '',
+      description: {},
+      salaryMin: 0,
+      salaryMax: 0,
+      location: '',
+      industry: '',
+      isRemote: true,
+    },
   });
 
-  const descriptionEditorRef = useRef<Quill>(null);
-  const requirementsEditorRef = useRef<Quill>(null);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Form Data:', formData);
+  const onSubmit = async (data: JobFormValues): Promise<void> => {
+    console.log('Form Data:', data);
     // Here you would typically send the data to your API
-  };
-
-  const handleDescriptionChange = (delta: any, oldDelta: any, source: string) => {
-    if (source === 'user' && descriptionEditorRef.current) {
-      const content = descriptionEditorRef.current.root.innerHTML;
-      setFormData({ ...formData, description: content });
-    }
-  };
-
-  const handleRequirementsChange = (delta: any, oldDelta: any, source: string) => {
-    if (source === 'user' && requirementsEditorRef.current) {
-      const content = requirementsEditorRef.current.root.innerHTML;
-      setFormData({ ...formData, requirements: content });
-    }
   };
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Create New Job Posting</h1>
-      
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label htmlFor="title" className="block text-sm font-medium mb-2">
-            Job Title
-          </label>
-          <input
-            type="text"
-            id="title"
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            className="w-full p-2 border rounded-md"
-            required
-          />
-        </div>
 
-        <div>
-          <label htmlFor="description" className="block text-sm font-medium mb-2">
-            Job Description
-          </label>
-          <div className="mb-4">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <CustomFormField
+            name="title"
+            label="Job Title"
+          >
+            <Input placeholder="Enter job title" />
+          </CustomFormField>
+
+          <div className="grid grid-cols-2 gap-4">
+            <CustomFormField
+              name="salaryMin"
+              label="Minimum Salary"
+            >
+              <Input
+                type="number"
+                placeholder="Enter minimum salary"
+                onChange={(e) => form.setValue('salaryMin', Number(e.target.value))}
+              />
+            </CustomFormField>
+
+            <CustomFormField
+              name="salaryMax"
+              label="Maximum Salary"
+            >
+              <Input
+                type="number"
+                placeholder="Enter maximum salary"
+                onChange={(e) => form.setValue('salaryMax', Number(e.target.value))}
+              />
+            </CustomFormField>
+          </div>
+
+          <CustomFormField
+            name="location"
+            label="Location"
+          >
+            <Input placeholder="Enter job location" />
+          </CustomFormField>
+
+          <CustomFormField
+            name="industry"
+            label="Industry"
+          >
+            <Input placeholder="Enter industry" />
+          </CustomFormField>
+
+          <div className="flex items-center space-x-2">
+            <div>
+              <label
+                htmlFor="isRemote"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Remote Position
+              </label>
+            </div>
+            <Switch
+              id="isRemote"
+              name="isRemote"
+              checked={form.getValues('isRemote')}
+              onCheckedChange={(checked: boolean) => {
+                console.log('checked', checked);
+                form.setValue('isRemote', checked);
+              }}
+            />
+          </div>
+          <CustomFormField
+            name="description"
+            label="Job Description"
+          >
             <Editor
-              ref={descriptionEditorRef}
-              defaultValue={formData.description ? { ops: [{ insert: formData.description }] } : undefined}
-              onTextChange={handleDescriptionChange}
+              defaultValue={form.getValues('description')}
+              onTextChange={(content) => form.setValue('description', content)}
               placeholder="Enter job description..."
-              className="min-h-[200px]"
             />
-          </div>
-        </div>
-
-        <div>
-          <label htmlFor="requirements" className="block text-sm font-medium mb-2">
-            Requirements
-          </label>
-          <div className="mb-4">
-            <Editor
-              ref={requirementsEditorRef}
-              defaultValue={formData.requirements ? { ops: [{ insert: formData.requirements }] } : undefined}
-              onTextChange={handleRequirementsChange}
-              placeholder="Enter job requirements..."
-              className="min-h-[200px]"
-            />
-          </div>
-        </div>
-
-        <Button type="submit" className="w-full">
-          Create Job Posting
-        </Button>
-      </form>
+          </CustomFormField>
+          <SubmitButton
+            type="submit"
+            className="w-full"
+            label="Create Job Posting"
+          />
+        </form>
+      </Form>
     </div>
   );
 };
