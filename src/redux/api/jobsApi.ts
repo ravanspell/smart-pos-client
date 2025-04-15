@@ -16,7 +16,7 @@ export interface JobPostingRequest {
 }
 
 // Define the job posting response interface
-export interface JobPostingResponse {
+export interface JobPostingsResponse {
     jobs: {
         id: string;
         title: string;
@@ -31,8 +31,23 @@ export interface JobPostingResponse {
     }[]
 }
 
+export interface JobPostingResponse {
+
+    id: string;
+    title: string;
+    description: string;
+    salaryMin: number;
+    salaryMax: number;
+    location: string;
+    industry: string;
+    isRemote: boolean;
+    createdAt: string;
+    updatedAt: string;
+
+}
+
 // Define the jobs response interface
-export interface JobsResponse extends ApiResponse<JobPostingResponse> { }
+export interface JobsResponse extends ApiResponse<JobPostingsResponse> { }
 
 // Define the get job by id response interface
 export interface GetJobByIdResponse extends ApiResponse<JobPostingResponse> { }

@@ -1,164 +1,127 @@
 "use client";
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { DataTable } from '@/components/molecules/DataTable/DataTable';
-import { ColumnDef, SortingState, PaginationState, RowSelectionState } from '@tanstack/react-table';
+import React from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useGetJobByIdQuery } from '@/redux/api/jobsApi';
 import { Button } from '@/components/atoms/Button';
-import { PlusIcon, Eye, Pencil, Trash } from 'lucide-react';
-import { useGetJobsQuery } from '@/redux/api/jobsApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/atoms/Card';
-import { SortableColumnHeader } from '@/components/molecules/SortableColumnHeader';
+import { Badge } from '@/components/atoms/Badge';
+import { Separator } from '@/components/ui/separator';
+import { format } from 'date-fns';
+import { ArrowLeft, Pencil, Trash } from 'lucide-react';
+import { toast } from 'sonner';
+import { useDeleteJobMutation } from '@/redux/api/jobsApi';
 
-// Define the job type for the table
-interface Job {
-  id: string;
-  title: string;
-  description: string;
-  salaryMin: number;
-  salaryMax: number;
-  location: string;
-  industry: string;
-  isRemote: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
 
-const JobsPage = () => {
+const JobDetailsPage = () => {
   const router = useRouter();
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
+  const searchParams = useSearchParams();
+  const jobId = searchParams.get('id');
+
+  // Fetch job details
+  const { data: jobResponse, isLoading, error } = useGetJobByIdQuery(jobId || '', {
+    skip: !jobId,
   });
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [deleteJob] = useDeleteJobMutation();
 
-  // Fetch jobs data
-  const { data, isLoading } = useGetJobsQuery({
-    page: pagination.pageIndex + 1,
-    limit: pagination.pageSize,
-  });
-console.log("data", data);
+  const job = jobResponse?.data;
 
-  // Extract jobs from the response
-  const jobs: Job[] = (data || []) as Job[];
-  const totalCount = jobs.length; // Since we don't have a total count in the response
+  // Handle job deletion
+  const handleDelete = async () => {
+    if (window.confirm('Are you sure you want to delete this job?')) {
+      try {
+        await deleteJob(jobId || '').unwrap();
+        toast.success('Job deleted successfully');
+        router.push('/dashboard/jobs/list');
+      } catch (error) {
+        toast.error('Failed to delete job');
+      }
+    }
+  };
 
-  // Define columns for the jobs table
-  const columns: ColumnDef<Job>[] = [
-    {
-      accessorKey: 'title',
-      header: ({ column }) => (
-        <SortableColumnHeader column={column} title="Job Title" />
-      ),
-    },
-    {
-      accessorKey: 'location',
-      header: ({ column }) => (
-        <SortableColumnHeader column={column} title="Location" />
-      ),
-    },
-    {
-      accessorKey: 'industry',
-      header: ({ column }) => (
-        <SortableColumnHeader column={column} title="Industry" />
-      ),
-    },
-    {
-      accessorKey: 'salaryMin',
-      header: ({ column }) => (
-        <SortableColumnHeader column={column} title="Min Salary" />
-      ),
-      cell: ({ row }) => {
-        const salary = row.getValue('salaryMin') as number;
-        return <span>${salary.toLocaleString()}</span>;
-      },
-    },
-    {
-      accessorKey: 'salaryMax',
-      header: ({ column }) => (
-        <SortableColumnHeader column={column} title="Max Salary" />
-      ),
-      cell: ({ row }) => {
-        const salary = row.getValue('salaryMax') as number;
-        return <span>${salary.toLocaleString()}</span>;
-      },
-    },
-    {
-      accessorKey: 'isRemote',
-      header: ({ column }) => (
-        <SortableColumnHeader column={column} title="Remote" />
-      ),
-      cell: ({ row }) => {
-        const isRemote = row.getValue('isRemote') as boolean;
-        return <span>{isRemote ? 'Yes' : 'No'}</span>;
-      },
-    },
-    {
-      id: 'actions',
-      header: 'Actions',
-      cell: ({ row }) => {
-        const job = row.original;
-        return (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => router.push(`/dashboard/jobs/${job.id}`)}
-            >
-              <Eye className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => router.push(`/dashboard/jobs/edit/${job.id}`)}
-            >
-              <Pencil className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => {
-                // Implement delete functionality
-                console.log('Delete job:', job.id);
-              }}
-            >
-              <Trash className="w-4 h-4" />
-            </Button>
-          </div>
-        );
-      },
-    },
-  ];
+  if (isLoading) {
+    return (
+      <div className="container mx-auto py-8 flex justify-center items-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-lg">Loading job data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !job) {
+    return (
+      <div className="container mx-auto py-8">
+        <div className="bg-destructive/10 text-destructive p-4 rounded-md">
+          <h2 className="text-xl font-semibold mb-2">Error</h2>
+          <p>Failed to load job data</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6">
+    <div className="container mx-auto py-8">
+      <div className="mb-6 flex items-center justify-between">
+        <Button variant="outline" onClick={() => router.push('/dashboard/jobs/list')}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Jobs
+        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => router.push(`/dashboard/jobs/edit/${jobId}`)}>
+            <Pencil className="mr-2 h-4 w-4" />
+            Edit
+          </Button>
+          <Button variant="destructive" onClick={handleDelete}>
+            <Trash className="mr-2 h-4 w-4" />
+            Delete
+          </Button>
+        </div>
+      </div>
+
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Job Postings</CardTitle>
-          <Button onClick={() => router.push('/dashboard/jobs/create')}>
-            <PlusIcon className="w-4 h-4 mr-2" />
-            Create Job
-          </Button>
+          <div>
+            <CardTitle className="text-2xl">{job.title}</CardTitle>
+            <p className="text-sm text-muted-foreground mt-1">
+              Created on {format(new Date(job.createdAt), 'PPP')}
+            </p>
+          </div>
+          <Badge variant={job.isRemote ? "secondary" : "outline"}>
+            {job.isRemote ? "Remote" : "On-site"}
+          </Badge>
         </CardHeader>
         <CardContent>
-          <DataTable
-            columns={columns}
-            data={jobs}
-            totalCount={totalCount}
-            sorting={sorting}
-            pagination={pagination}
-            onSortingChange={setSorting}
-            onPaginationChange={setPagination}
-            onRowSelectionChange={setRowSelection}
-            rowSelection={rowSelection}
-            loading={isLoading}
-            enableRowSelection={true}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+              <h3 className="font-semibold mb-2">Location</h3>
+              <p>{job.location || 'Not specified'}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-2">Industry</h3>
+              <p>{job.industry || 'Not specified'}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-2">Salary Range</h3>
+              <p>${job.salaryMin.toLocaleString()} - ${job.salaryMax.toLocaleString()}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-2">Last Updated</h3>
+              <p>{format(new Date(job.updatedAt), 'PPP')}</p>
+            </div>
+          </div>
+
+          <Separator className="my-6" />
+
+          <div>
+            <h3 className="font-semibold mb-2">Job Description</h3>
+            <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: job.description }} />
+          </div>
         </CardContent>
       </Card>
     </div>
   );
 };
 
-export default JobsPage; 
+export default JobDetailsPage; 
