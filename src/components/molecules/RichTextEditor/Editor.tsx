@@ -1,7 +1,6 @@
 'use client';
 
-import React, { forwardRef, useEffect, useLayoutEffect, useRef } from 'react';
-import Quill from 'quill';
+import React, { forwardRef, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import 'react-quill/dist/quill.snow.css';
 
 interface EditorProps {
@@ -10,13 +9,13 @@ interface EditorProps {
    * @default false
    */
   readOnly?: boolean;
-  
+
   /**
    * Initial content for the editor in Quill Delta format
    * Example: { ops: [{ insert: 'Hello World' }] }
    */
   defaultValue?: any;
-  
+
   /**
    * Callback function that is triggered when the editor content changes
    * @param delta - The changes made to the document
@@ -24,7 +23,7 @@ interface EditorProps {
    * @param source - The source of the change ('user', 'api', 'silent')
    */
   onTextChange?: (delta: any, oldDelta: any, source: string) => void;
-  
+
   /**
    * Callback function that is triggered when the text selection changes
    * @param range - The new selection range
@@ -32,12 +31,12 @@ interface EditorProps {
    * @param source - The source of the change ('user', 'api', 'silent')
    */
   onSelectionChange?: (range: any, oldRange: any, source: string) => void;
-  
+
   /**
    * Placeholder text to display when the editor is empty
    */
   placeholder?: string;
-  
+
   /**
    * Additional CSS classes to apply to the editor container
    */
@@ -45,12 +44,19 @@ interface EditorProps {
 }
 
 // Editor is an uncontrolled React component
-const Editor = forwardRef<Quill, EditorProps>(
+const Editor = forwardRef<any, EditorProps>(
   ({ readOnly = false, defaultValue, onTextChange, onSelectionChange, placeholder, className }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const defaultValueRef = useRef(defaultValue);
     const onTextChangeRef = useRef(onTextChange);
     const onSelectionChangeRef = useRef(onSelectionChange);
+    const [isClient, setIsClient] = useState(false);
+    const quillInstanceRef = useRef<any>(null);
+
+    // Set isClient to true when component mounts (client-side only)
+    useEffect(() => {
+      setIsClient(true);
+    }, []);
 
     useLayoutEffect(() => {
       onTextChangeRef.current = onTextChange;
@@ -58,50 +64,63 @@ const Editor = forwardRef<Quill, EditorProps>(
     });
 
     useEffect(() => {
-      if (ref && 'current' in ref && ref.current) {
-        ref.current.enable(!readOnly);
-      }
-    }, [ref, readOnly]);
+      if (!isClient || !containerRef.current) return;
 
-    useEffect(() => {
-      if (!containerRef.current) return;
-      
-      const container = containerRef.current;
-      const editorContainer = container.appendChild(
-        container.ownerDocument.createElement('div'),
-      );
-      
-      const quill = new Quill(editorContainer, {
-        theme: 'snow',
-        placeholder,
-        readOnly,
-      });
+      // Dynamically import Quill only on the client side
+      import('quill').then((QuillModule) => {
+        const Quill = QuillModule.default;
 
-      if (ref && 'current' in ref) {
-        ref.current = quill;
-      }
+        const container = containerRef.current;
+        if (!container) return;
 
-      if (defaultValueRef.current) {
-        quill.setContents(defaultValueRef.current);
-      }
+        // Clear any existing content
+        container.innerHTML = '';
 
-      quill.on('text-change', (...args) => {
-        onTextChangeRef.current?.(...args);
-      });
+        const editorContainer = container.appendChild(
+          container.ownerDocument.createElement('div'),
+        );
 
-      quill.on('selection-change', (...args) => {
-        onSelectionChangeRef.current?.(...args);
-      });
+        const quill = new Quill(editorContainer, {
+          theme: 'snow',
+          placeholder,
+          readOnly,
+        });
 
-      return () => {
+        quillInstanceRef.current = quill;
+
         if (ref && 'current' in ref) {
-          ref.current = null;
+          ref.current = quill;
         }
-        if (container) {
-          container.innerHTML = '';
+
+        if (defaultValueRef.current) {
+          quill.setContents(defaultValueRef.current);
         }
-      };
-    }, [ref, placeholder, readOnly]);
+
+        quill.on('text-change', (...args) => {
+          onTextChangeRef.current?.(...args);
+        });
+
+        quill.on('selection-change', (...args) => {
+          onSelectionChangeRef.current?.(...args);
+        });
+
+        return () => {
+          if (ref && 'current' in ref) {
+            ref.current = null;
+          }
+          if (container) {
+            container.innerHTML = '';
+          }
+        };
+      });
+    }, [isClient, ref, placeholder, readOnly]);
+
+    // Update readOnly state when it changes
+    useEffect(() => {
+      if (isClient && quillInstanceRef.current) {
+        quillInstanceRef.current.enable(!readOnly);
+      }
+    }, [isClient, readOnly]);
 
     return (
       <div className={`editor-container ${className || ''}`}>
