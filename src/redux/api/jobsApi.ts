@@ -28,11 +28,14 @@ export interface JobPostingsResponse {
         isRemote: boolean;
         createdAt: string;
         updatedAt: string;
-    }[]
+    }[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
 }
 
 export interface JobPostingResponse {
-
     id: string;
     title: string;
     description: string;
@@ -74,7 +77,7 @@ export const jobsApi = createApi({
             }),
             invalidatesTags: jobsInvalidateTags,
         }),
-        getJobs: builder.query<JobsResponse['data']['jobs'], GetJobsParams>({
+        getJobs: builder.query<JobsResponse['data'], GetJobsParams>({
             query: (params) => {
                 const { page = 1, limit = 10 } = params;
                 return {
@@ -83,7 +86,7 @@ export const jobsApi = createApi({
                 };
             },
             transformResponse: (response: JobsResponse) => {
-                return response?.data?.jobs || [];
+                return response?.data;
             },
             providesTags: jobsInvalidateTags,
         }),

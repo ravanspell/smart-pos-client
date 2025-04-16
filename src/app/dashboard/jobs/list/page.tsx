@@ -24,6 +24,11 @@ interface Job {
   updatedAt: string;
 }
 
+interface JobsResponse {
+  jobs: Job[];
+  total: number;
+}
+
 const JobsPage = () => {
   const router = useRouter();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -38,11 +43,11 @@ const JobsPage = () => {
     page: pagination.pageIndex + 1,
     limit: pagination.pageSize,
   });
-console.log("data", data);
 
-  // Extract jobs from the response
-  const jobs: Job[] = (data || []) as Job[];
-  const totalCount = jobs.length; // Since we don't have a total count in the response
+  // Extract jobs and pagination data from the response
+  const jobsResponse = data as unknown as JobsResponse;
+  const jobs = jobsResponse?.jobs || [];
+  const totalCount = jobsResponse?.total || 0;
 
   // Define columns for the jobs table
   const columns: ColumnDef<Job>[] = [
