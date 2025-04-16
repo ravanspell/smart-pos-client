@@ -9,6 +9,7 @@ import { PlusIcon, Eye, Pencil, Trash } from 'lucide-react';
 import { useGetJobsQuery } from '@/redux/api/jobsApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/atoms/Card';
 import { SortableColumnHeader } from '@/components/molecules/SortableColumnHeader';
+import { JOB_EDIT_ROUTE, JOB_CREATE_ROUTE } from '@/constants/routes';
 
 // Define the job type for the table
 interface Job {
@@ -116,7 +117,7 @@ const JobsPage = () => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => router.push(`/dashboard/jobs/edit?id=${job.id}`)}
+              onClick={() => router.push(`${JOB_EDIT_ROUTE}?id=${job.id}`)}
             >
               <Pencil className="w-4 h-4" />
             </Button>
@@ -141,7 +142,7 @@ const JobsPage = () => {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Job Postings</CardTitle>
-          <Button onClick={() => router.push('/dashboard/jobs/create')}>
+          <Button onClick={() => router.push(JOB_CREATE_ROUTE)}>
             <PlusIcon className="w-4 h-4 mr-2" />
             Create Job
           </Button>

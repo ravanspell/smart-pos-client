@@ -8,11 +8,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/atoms/Car
 import { Badge } from '@/components/atoms/Badge';
 import { Separator } from '@/components/ui/separator';
 import { format } from 'date-fns';
-import { ArrowLeft, Pencil, Trash } from 'lucide-react';
+import { Pencil, Trash } from 'lucide-react';
 import { toast } from 'sonner';
 import { useDeleteJobMutation } from '@/redux/api/jobsApi';
 import { useBreadcrumb } from '@/hooks/useBreadcrumb';
-
+import { JOBS_ROUTE } from '@/constants/routes';
 
 const JobDetailsPage = () => {
   const router = useRouter();
@@ -25,9 +25,10 @@ const JobDetailsPage = () => {
   });
   const [deleteJob] = useDeleteJobMutation();
 
+  // Breadcrumb setup for page
   useBreadcrumb([{
     label: 'Jobs',
-    href: '/dashboard/jobs/list'
+    href: JOBS_ROUTE
   },
   {
     label: jobResponse?.data?.title || '',
@@ -43,7 +44,7 @@ const JobDetailsPage = () => {
       try {
         await deleteJob(jobId || '').unwrap();
         toast.success('Job deleted successfully');
-        router.push('/dashboard/jobs/list');
+        router.push(JOBS_ROUTE);
       } catch (error) {
         toast.error('Failed to delete job');
       }

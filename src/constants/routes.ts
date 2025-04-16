@@ -6,3 +6,6 @@ export const JOBS_ROUTE = '/dashboard/jobs/list';
 export const DEFAULT_SETTINGS_ROUTE = '/dashboard/settings/general';
 export const LOGIN_ROUTE = '/login';
 export const CANDIDATES_ROUTE = '/dashboard/candidates';
+export const JOB_DETAILS_ROUTE = '/dashboard/jobs';
+export const JOB_EDIT_ROUTE = '/dashboard/jobs/edit';
+export const JOB_CREATE_ROUTE = '/dashboard/jobs/create';

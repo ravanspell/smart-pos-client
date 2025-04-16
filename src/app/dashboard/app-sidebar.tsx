@@ -47,12 +47,12 @@ const data = {
             icon: Briefcase,
             items: [
                 {
-                    title: "Candidates",
-                    url: CANDIDATES_ROUTE,
-                },
-                {
                     title: "Jobs",
                     url: JOBS_ROUTE,
+                },
+                {
+                    title: "Candidates",
+                    url: CANDIDATES_ROUTE,
                 },
             ],
         },

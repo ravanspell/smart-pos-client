@@ -14,6 +14,8 @@ import { useCreateJobMutation } from '@/redux/api/jobsApi';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
+import { JOB_DETAILS_ROUTE } from '@/constants/routes';
+import { CheckCircleIcon } from 'lucide-react';
 
 // Define the Zod schema
 const jobFormSchema = z.object({
@@ -32,7 +34,7 @@ const JobDashboard = () => {
   const router = useRouter();
   const { handleError } = useErrorHandler();
   const [createJob, { isLoading }] = useCreateJobMutation();
-  
+
   const form = useForm<JobFormValues>({
     resolver: zodResolver(jobFormSchema),
     defaultValues: {
@@ -56,14 +58,16 @@ const JobDashboard = () => {
         salaryMin: Number(data.salaryMin) || 0,
         salaryMax: Number(data.salaryMax) || 0,
       };
-      
-      await createJob(formattedData).unwrap();
-      toast.success('Job posting created successfully');
+      const response = await createJob(formattedData).unwrap();
+      toast.success('Job posting created successfully', {
+        icon: <CheckCircleIcon className="w-4 h-4" />,
+      });
+      router.push(`${JOB_DETAILS_ROUTE}?id=${response.id}`);
     } catch (error) {
       handleError(error);
     }
   };
-  console.log(form.getValues());
+
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Create New Job Posting</h1>
@@ -96,7 +100,7 @@ const JobDashboard = () => {
               label="Maximum Salary"
             >
               <Input
-              
+
                 placeholder="Enter maximum salary"
                 onChange={(e) => {
                   const value = e.target.value;

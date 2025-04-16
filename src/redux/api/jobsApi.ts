@@ -75,6 +75,7 @@ export const jobsApi = createApi({
                 method: HTTPMethod.POST,
                 body: data,
             }),
+            transformResponse: (response: ApiResponse<JobPostingResponse>) => response.data,
             invalidatesTags: jobsInvalidateTags,
         }),
         getJobs: builder.query<JobsResponse['data'], GetJobsParams>({
