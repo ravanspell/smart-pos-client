@@ -14,8 +14,10 @@ import { useCreateJobMutation } from '@/redux/api/jobsApi';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
+import { JOBS_ROUTE } from '@/constants/routes';
 import { JOB_DETAILS_ROUTE } from '@/constants/routes';
 import { CheckCircleIcon } from 'lucide-react';
+import { useBreadcrumb } from '@/hooks/useBreadcrumb';
 
 // Define the Zod schema
 const jobFormSchema = z.object({
@@ -31,6 +33,18 @@ const jobFormSchema = z.object({
 type JobFormValues = z.infer<typeof jobFormSchema>;
 
 const JobDashboard = () => {
+
+  // Breadcrumb setup for page
+  useBreadcrumb([{
+    label: 'Jobs',
+    href: JOBS_ROUTE
+  },
+  {
+    label: 'Create New Job Posting',
+    href: ''
+  }
+  ]);
+
   const router = useRouter();
   const { handleError } = useErrorHandler();
   const [createJob, { isLoading }] = useCreateJobMutation();
