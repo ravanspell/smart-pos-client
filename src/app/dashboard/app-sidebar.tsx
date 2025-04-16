@@ -24,7 +24,7 @@ import {
     FILE_MANAGEMENT_ROUTE,
     DEFAULT_SETTINGS_ROUTE,
     CANDIDATES_ROUTE,
-    RECRUITMENT_ROUTE
+    JOBS_ROUTE
 } from "@/constants/routes"
 
 
@@ -47,12 +47,12 @@ const data = {
             icon: Briefcase,
             items: [
                 {
-                    title: "Candidates",
-                    url: CANDIDATES_ROUTE,
+                    title: "Jobs",
+                    url: JOBS_ROUTE,
                 },
                 {
-                    title: "Jobs",
-                    url: RECRUITMENT_ROUTE,
+                    title: "Candidates",
+                    url: CANDIDATES_ROUTE,
                 },
             ],
         },

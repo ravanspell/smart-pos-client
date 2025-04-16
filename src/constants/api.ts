@@ -27,3 +27,11 @@ export const CANDIDATES = {
     SEARCH_CANDIDATES: '/v1/candidate',
     GET_CANDIDATE: '/v1/candidate'
 }
+
+export const JOBS = {
+    CREATE_JOB: 'v1/jobs',
+    GET_JOBS: 'v1/jobs',
+    GET_JOB_BY_ID: 'v1/jobs',
+    UPDATE_JOB: 'v1/jobs',
+    DELETE_JOB: 'v1/jobs'
+}
