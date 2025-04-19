@@ -9,3 +9,4 @@ export const CANDIDATES_ROUTE = '/dashboard/candidates';
 export const JOB_DETAILS_ROUTE = '/dashboard/jobs';
 export const JOB_EDIT_ROUTE = '/dashboard/jobs/edit';
 export const JOB_CREATE_ROUTE = '/dashboard/jobs/create';
+export const PERMISSIONS_ROUTE = '/dashboard/settings/permissions';

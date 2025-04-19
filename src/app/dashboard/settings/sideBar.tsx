@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { DEFAULT_SETTINGS_ROUTE } from '@/constants/routes';
+import { DEFAULT_SETTINGS_ROUTE, PERMISSIONS_ROUTE } from '@/constants/routes';
 
 export interface MenuItem {
     href: string;
@@ -12,7 +12,7 @@ export interface MenuItem {
 const Sidebar: React.FC = () => {
     const menuItems: MenuItem[] = [
         { href: DEFAULT_SETTINGS_ROUTE, label: 'General Settings' },
-        { href: '/settings/employee-permission', label: 'Employee Permission' },
+        { href: PERMISSIONS_ROUTE, label: 'Permissions' },
         { href: '/settings/accessibility-restriction', label: 'Accessibility Restriction' },
         { href: '/settings/user-group', label: 'User Group' },
         { href: '/settings/date-time-format', label: 'Date & Time Format' },
