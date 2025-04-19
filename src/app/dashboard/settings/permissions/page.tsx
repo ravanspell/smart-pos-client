@@ -13,20 +13,15 @@ import {
 } from '@tanstack/react-table';
 import { Plus } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { useGetPermissionCategoriesQuery } from '@/redux/api/permissionsAPI';
+import { PermissionCategory } from '@/redux/api/permissionsAPI';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 
 // Lazy load the form component
 const PermissionCategoryForm = dynamic(
     () => import('@/components/organisms/PermissionCategoryForm'),
     { ssr: false }
 );
-
-// Define the permission category type
-interface PermissionCategory {
-    id: string;
-    name: string;
-    description: string;
-    createdAt: string;
-}
 
 // Define columns for the data table
 const columns: ColumnDef<PermissionCategory>[] = [
@@ -50,28 +45,31 @@ const PermissionsPage: React.FC = () => {
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+    const { handleError } = useErrorHandler();
 
     // State for the modal
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // Mock data - replace with actual API call
-    const mockData: PermissionCategory[] = [
-        {
-            id: '1',
-            name: 'User Management',
-            description: 'Permissions related to user management',
-            createdAt: '2023-01-01',
-        },
-        {
-            id: '2',
-            name: 'Content Management',
-            description: 'Permissions related to content management',
-            createdAt: '2023-01-02',
-        },
-    ];
+    // Fetch permission categories from the API
+    const { data, isLoading, error } = useGetPermissionCategoriesQuery({
+        page: pagination.pageIndex + 1,
+        limit: pagination.pageSize,
+        sortBy: sorting.length > 0 ? sorting[0].id : undefined,
+        sortOrder: sorting.length > 0 ? sorting[0].desc ? 'desc' : 'asc' : undefined,
+        filter: columnFilters.length > 0 ? columnFilters.reduce((acc, filter) => {
+            acc[filter.id] = filter.value;
+            return acc;
+        }, {} as Record<string, any>) : undefined,
+    });
 
-    // Mock total count - replace with actual count from API
-    const totalCount = mockData.length;
+    // Handle API errors
+    if (error) {
+        handleError(error);
+    }
+
+    // Extract data safely
+    const items = data?.items || [];
+    const totalItems = data?.meta?.totalItems || 0;
 
     return (
         <>
@@ -92,8 +90,8 @@ const PermissionsPage: React.FC = () => {
                 <div className="mt-4">
                     <DataTable
                         columns={columns}
-                        data={mockData}
-                        totalCount={totalCount}
+                        data={items}
+                        totalCount={totalItems}
                         pagination={pagination}
                         sorting={sorting}
                         columnFilters={columnFilters}
@@ -104,7 +102,7 @@ const PermissionsPage: React.FC = () => {
                         onColumnFiltersChange={setColumnFilters}
                         onColumnVisibilityChange={setColumnVisibility}
                         onRowSelectionChange={setRowSelection}
-                        loading={false}
+                        loading={isLoading}
                         enableRowSelection={true}
                     />
                 </div>

@@ -11,6 +11,8 @@ import { CustomFormField } from '@/components/molecules/FormField';
 import { Button } from '@/components/atoms/Button';
 import { Form } from '@/components/atoms/Form';
 import { toast } from 'sonner';
+import { useCreatePermissionCategoryMutation } from '@/redux/api/permissionsAPI';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 
 // Define the validation schema with zod
 const permissionCategorySchema = z.object({
@@ -28,6 +30,8 @@ interface PermissionCategoryFormProps {
 
 const PermissionCategoryForm: React.FC<PermissionCategoryFormProps> = ({ isOpen, onClose }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { handleError } = useErrorHandler();
+  const [createPermissionCategory] = useCreatePermissionCategoryMutation();
 
   // Initialize form with react-hook-form and zod validation
   const form = useForm<PermissionCategoryFormValues>({
@@ -42,17 +46,18 @@ const PermissionCategoryForm: React.FC<PermissionCategoryFormProps> = ({ isOpen,
     setIsSubmitting(true);
     
     try {
-      // TODO: Implement API call to save the permission category
-      console.log(data);
-      
+      // Call the API to create the permission category
+      await createPermissionCategory({
+        name: data.name,
+        description: data.description || '',
+      }).unwrap();
       // Show success message
       toast.success('Permission category created successfully');
-      
       // Reset form and close modal
       form.reset();
       onClose();
     } catch (error) {
-      console.error('Error saving permission category:', error);
+      handleError(error);
       toast.error('Failed to create permission category');
     } finally {
       setIsSubmitting(false);

@@ -8,6 +8,7 @@ import { rolesApi } from "../api/rolesAPI";
 import { appAPI } from "../api/appAPI";
 import { candidatesApi } from "../api/candidatesApi";
 import { jobsApi } from "../api/jobsApi";
+import { permissionsApi } from "../api/permissionsAPI";
 // `combineSlices` automatically combines the reducers using
 // their `reducerPath`s, therefore we no longer need to call `combineReducers`.
 const rootReducer = combineReducers({
@@ -22,5 +23,6 @@ const rootReducer = combineReducers({
     [appAPI.reducerPath]: appAPI.reducer,
     [candidatesApi.reducerPath]: candidatesApi.reducer,
     [jobsApi.reducerPath]: jobsApi.reducer,
+    [permissionsApi.reducerPath]: permissionsApi.reducer,
 });
 export default rootReducer;
