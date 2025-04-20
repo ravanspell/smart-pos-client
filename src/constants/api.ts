@@ -40,5 +40,9 @@ export const PERMISSIONS = {
     GET_PERMISSION_CATEGORIES: 'v1/permission-categories',
     CREATE_PERMISSION_CATEGORY: 'v1/permission-categories',
     UPDATE_PERMISSION_CATEGORY: 'v1/permission-categories',
-    DELETE_PERMISSION_CATEGORY: 'v1/permission-categories'
+    DELETE_PERMISSION_CATEGORY: 'v1/permission-categories',
+    GET_PERMISSIONS: 'v1/permissions',
+    CREATE_PERMISSION: 'v1/permissions',
+    UPDATE_PERMISSION: 'v1/permissions',
+    DELETE_PERMISSION: 'v1/permissions'
 }

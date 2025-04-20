@@ -15,7 +15,7 @@ import dynamic from 'next/dynamic';
 import { useGetPermissionCategoriesQuery } from '@/redux/api/permissionsAPI';
 import { PermissionCategory } from '@/redux/api/permissionsAPI';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
-
+import PermissionsPageSection from './index';
 // Lazy load the form component
 const PermissionCategoryForm = dynamic(
     () => import('@/components/organisms/PermissionCategoryForm'),
@@ -85,6 +85,10 @@ const PermissionsPage: React.FC = () => {
                     onClose={() => setIsModalOpen(false)}
                 />
             )}
+
+            <div className="mt-4">
+                <PermissionsPageSection />
+            </div>
         </>
     );
 };

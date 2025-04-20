@@ -24,18 +24,41 @@ export interface PermissionCategory {
   updatedAt: string;
 }
 
+// Define the Permission type
+export interface Permission {
+  id: string;
+  displayName: string;
+  permissionKey: string;
+  description: string;
+  categoryId: string;
+  categoryName: string;
+  createdBy: string;
+  updatedBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Define the request payload for creating a permission category
 export interface CreatePermissionCategoryRequest {
   name: string;
   description: string;
 }
 
+// Define the request payload for creating a permission
+export interface CreatePermissionRequest {
+  displayName: string;
+  permissionKey: string;
+  description: string;
+  categoryId: string;
+}
+
 const PERMISSION_CATEGORY_INVALIDATE_TAG = 'PermissionCategory';
+const PERMISSION_INVALIDATE_TAG = 'Permission';
 
 export const permissionsApi = createApi({
   reducerPath: 'permissionsApi',
   baseQuery: baseQuery,
-  tagTypes: [PERMISSION_CATEGORY_INVALIDATE_TAG],
+  tagTypes: [PERMISSION_CATEGORY_INVALIDATE_TAG, PERMISSION_INVALIDATE_TAG],
   endpoints: (builder) => ({
     getPermissionCategories: builder.query<PermissionCategory[], void>({
       query: () => PERMISSIONS.GET_PERMISSION_CATEGORIES,
@@ -73,6 +96,44 @@ export const permissionsApi = createApi({
       }),
       invalidatesTags: (result, error, id) => [{ type: PERMISSION_CATEGORY_INVALIDATE_TAG, id }],
     }),
+    
+    // Permission endpoints
+    getPermissions: builder.query<Permission[], void>({
+      query: () => PERMISSIONS.GET_PERMISSIONS,
+      transformResponse: (response: ApiResponse<Permission[]>) => response.data,
+      providesTags: [{ type: PERMISSION_INVALIDATE_TAG, id: 'LIST' }],
+    }),
+    
+    getPermission: builder.query<Permission, string>({
+      query: (id) => `${PERMISSIONS.GET_PERMISSIONS}/${id}`,
+      providesTags: (result, error, id) => [{ type: PERMISSION_INVALIDATE_TAG, id }],
+    }),
+    
+    createPermission: builder.mutation<Permission, CreatePermissionRequest>({
+      query: (permission) => ({
+        url: PERMISSIONS.CREATE_PERMISSION,
+        method: HTTPMethod.POST,
+        body: permission,
+      }),
+      invalidatesTags: [{ type: PERMISSION_INVALIDATE_TAG, id: 'LIST' }],
+    }),
+    
+    updatePermission: builder.mutation<Permission, Partial<Permission> & Pick<Permission, 'id'>>({
+      query: ({ id, ...permission }) => ({
+        url: `${PERMISSIONS.GET_PERMISSIONS}/${id}`,
+        method: HTTPMethod.PUT,
+        body: permission,
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: PERMISSION_INVALIDATE_TAG, id }],
+    }),
+    
+    deletePermission: builder.mutation<{ success: boolean; id: string }, string>({
+      query: (id) => ({
+        url: `${PERMISSIONS.GET_PERMISSIONS}/${id}`,
+        method: HTTPMethod.DELETE,
+      }),
+      invalidatesTags: (result, error, id) => [{ type: PERMISSION_INVALIDATE_TAG, id }],
+    }),
   }),
 });
 
@@ -82,4 +143,9 @@ export const {
   useCreatePermissionCategoryMutation,
   useUpdatePermissionCategoryMutation,
   useDeletePermissionCategoryMutation,
+  useGetPermissionsQuery,
+  useGetPermissionQuery,
+  useCreatePermissionMutation,
+  useUpdatePermissionMutation,
+  useDeletePermissionMutation,
 } = permissionsApi; 
