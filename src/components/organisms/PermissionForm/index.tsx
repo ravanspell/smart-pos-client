@@ -13,6 +13,7 @@ import { useGetPermissionCategoriesQuery } from '@/redux/api/permissionsAPI';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { toast } from 'sonner';
 import { CustomFormField } from '@/components/molecules/FormField';
+import { Switch } from '@/components/atoms/Switch';
 
 // Define the form schema with Zod
 const permissionFormSchema = z.object({
@@ -20,6 +21,8 @@ const permissionFormSchema = z.object({
     permissionKey: z.string().min(1, 'Permission key is required'),
     description: z.string().min(1, 'Description is required'),
     categoryId: z.string().min(1, 'Permission category is required'),
+    resource: z.string().min(1, 'Resource is required'),
+    isBasePermission: z.boolean().default(false),
 });
 
 // Infer the type from the schema
@@ -42,17 +45,15 @@ const PermissionForm: React.FC<PermissionFormProps> = ({ isOpen, onClose }) => {
             permissionKey: '',
             description: '',
             categoryId: '',
+            resource: 'permission',
+            isBasePermission: false,
         },
     });
 
     // Handle form submission
     const onSubmit = async (data: PermissionFormValues) => {
         try {
-            const payload = {
-                ...data,
-                resource: 'permission',
-            }
-            await createPermission(payload).unwrap();
+            await createPermission(data).unwrap();
             toast.success('Permission created successfully');
             onClose();
         } catch (error) {
@@ -100,6 +101,23 @@ const PermissionForm: React.FC<PermissionFormProps> = ({ isOpen, onClose }) => {
                             options={categoryOptions}
                             value={methods.watch('categoryId')}
                             onChange={(value) => methods.setValue('categoryId', value)}
+                        />
+                    </CustomFormField>
+
+                    <CustomFormField
+                        name="resource"
+                        label="Resource"
+                    >
+                        <Input placeholder="Enter resource" />
+                    </CustomFormField>
+
+                    <CustomFormField
+                        name="isBasePermission"
+                        label="Base Permission"
+                    >
+                        <Switch
+                            checked={methods.watch('isBasePermission')}
+                            onCheckedChange={(checked) => methods.setValue('isBasePermission', checked)}
                         />
                     </CustomFormField>
 

@@ -13,9 +13,9 @@ import {
 } from '@tanstack/react-table';
 import { Plus } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { useGetPermissionsQuery } from '@/redux/api/permissionsAPI';
-import { Permission } from '@/redux/api/permissionsAPI';
+import { useGetPermissionsQuery, Permission, PermissionsPaginatedResponse } from '@/redux/api/permissionsAPI';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
+import { Badge } from '@/components/atoms/Badge';
 
 const PermissionForm = dynamic(
     () => import('@/components/organisms/PermissionForm'),
@@ -37,8 +37,24 @@ const columns: ColumnDef<Permission>[] = [
         header: 'Description',
     },
     {
-        accessorKey: 'categoryName',
+        accessorKey: 'category.name',
         header: 'Category',
+    },
+    {
+        accessorKey: 'resource',
+        header: 'Resource',
+    },
+    {
+        accessorKey: 'isBasePermission',
+        header: 'Base Permission',
+        cell: ({ row }) => {
+            const isBasePermission = row.original.isBasePermission;
+            return (
+                <Badge variant={isBasePermission ? "default" : "outline"}>
+                    {isBasePermission ? "Yes" : "No"}
+                </Badge>
+            );
+        },
     }
 ];
 
@@ -64,8 +80,8 @@ const PermissionsPageSection: React.FC = () => {
     }
 
     // Extract permissions and pagination data
-    const permissions = data?.items || [];
-    const totalCount = data?.meta?.totalItems || 0;
+    const permissions = data?.permissions || [];
+    const totalCount = data?.total || 0;
 
     return (
         <>

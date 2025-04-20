@@ -31,11 +31,13 @@ export interface Permission {
   permissionKey: string;
   description: string;
   categoryId: string;
-  categoryName: string;
-  createdBy: string;
-  updatedBy: string;
+  resource: string;
+  isBasePermission: boolean;
   createdAt: string;
   updatedAt: string;
+  createdBy: string;
+  updatedBy: string;
+  category: PermissionCategory;
 }
 
 // Define the request payload for creating a permission category
@@ -50,6 +52,16 @@ export interface CreatePermissionRequest {
   permissionKey: string;
   description: string;
   categoryId: string;
+  resource: string;
+  isBasePermission: boolean;
+}
+
+// Define the paginated response for permissions
+export interface PermissionsPaginatedResponse {
+  permissions: Permission[];
+  total: number;
+  page: number;
+  limit: number;
 }
 
 const PERMISSION_CATEGORY_INVALIDATE_TAG = 'PermissionCategory';
@@ -98,7 +110,7 @@ export const permissionsApi = createApi({
     }),
     
     // Permission endpoints
-    getPermissions: builder.query<PaginatedResponse<Permission>, QueryParams<Permission>>({
+    getPermissions: builder.query<PermissionsPaginatedResponse, QueryParams<Permission>>({
       query: (params) => {
         // Construct the query string
         const queryParams = new URLSearchParams();
@@ -115,7 +127,7 @@ export const permissionsApi = createApi({
           url: `${PERMISSIONS.GET_PERMISSIONS}?${queryParams.toString()}`,
         };
       },
-      transformResponse: (response: ApiResponse<PaginatedResponse<Permission>>) => response.data,
+      transformResponse: (response: ApiResponse<PermissionsPaginatedResponse>) => response.data,
       providesTags: [{ type: PERMISSION_INVALIDATE_TAG, id: 'LIST' }],
     }),
     
