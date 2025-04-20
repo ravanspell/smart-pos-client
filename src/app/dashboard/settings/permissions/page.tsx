@@ -39,10 +39,8 @@ const PermissionsPage: React.FC = () => {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
     const { handleError } = useErrorHandler();
-
     // State for the modal
     const [isModalOpen, setIsModalOpen] = useState(false);
-
     // Fetch permission categories from the API
     const { data: permissionCategories = [], isLoading, error } = useGetPermissionCategoriesQuery();
 
@@ -63,9 +61,7 @@ const PermissionsPage: React.FC = () => {
                         Add Permission Category
                     </Button>
                 </div>
-
                 <Separator />
-
                 <div className="mt-4">
                     <DataTable
                         columns={columns}
@@ -82,7 +78,6 @@ const PermissionsPage: React.FC = () => {
                     />
                 </div>
             </div>
-
             {/* Modal for adding new permission category */}
             {isModalOpen && (
                 <PermissionCategoryForm

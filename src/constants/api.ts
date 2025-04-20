@@ -35,3 +35,10 @@ export const JOBS = {
     UPDATE_JOB: 'v1/jobs',
     DELETE_JOB: 'v1/jobs'
 }
+
+export const PERMISSIONS = {
+    GET_PERMISSION_CATEGORIES: 'v1/permission-categories',
+    CREATE_PERMISSION_CATEGORY: 'v1/permission-categories',
+    UPDATE_PERMISSION_CATEGORY: 'v1/permission-categories',
+    DELETE_PERMISSION_CATEGORY: 'v1/permission-categories'
+}

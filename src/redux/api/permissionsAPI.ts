@@ -2,6 +2,7 @@ import { PaginatedResponse, QueryParams } from '@/types';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import HTTPMethod from 'http-method-enum';
 import { baseQuery } from './api';
+import { PERMISSIONS } from '@/constants/api';
 
 // Define the API response type
 export interface ApiResponse<T> {
@@ -37,18 +38,19 @@ export const permissionsApi = createApi({
   tagTypes: [PERMISSION_CATEGORY_INVALIDATE_TAG],
   endpoints: (builder) => ({
     getPermissionCategories: builder.query<PermissionCategory[], void>({
-      query: () => 'permission-categories',
+      query: () => PERMISSIONS.GET_PERMISSION_CATEGORIES,
       transformResponse: (response: ApiResponse<PermissionCategory[]>) => response.data,
+      providesTags: [{ type: PERMISSION_CATEGORY_INVALIDATE_TAG, id: 'LIST' }],
     }),
     
     getPermissionCategory: builder.query<PermissionCategory, string>({
-      query: (id) => `permission-categories/${id}`,
+      query: (id) => `${PERMISSIONS.GET_PERMISSION_CATEGORIES}/${id}`,
       providesTags: (result, error, id) => [{ type: PERMISSION_CATEGORY_INVALIDATE_TAG, id }],
     }),
     
     createPermissionCategory: builder.mutation<PermissionCategory, CreatePermissionCategoryRequest>({
       query: (category) => ({
-        url: 'v1/permission-categories',
+        url: PERMISSIONS.CREATE_PERMISSION_CATEGORY,
         method: HTTPMethod.POST,
         body: category,
       }),
@@ -57,7 +59,7 @@ export const permissionsApi = createApi({
     
     updatePermissionCategory: builder.mutation<PermissionCategory, Partial<PermissionCategory> & Pick<PermissionCategory, 'id'>>({
       query: ({ id, ...category }) => ({
-        url: `permission-categories/${id}`,
+        url: `${PERMISSIONS.GET_PERMISSION_CATEGORIES}/${id}`,
         method: HTTPMethod.PUT,
         body: category,
       }),
@@ -66,7 +68,7 @@ export const permissionsApi = createApi({
     
     deletePermissionCategory: builder.mutation<{ success: boolean; id: string }, string>({
       query: (id) => ({
-        url: `permission-categories/${id}`,
+        url: `${PERMISSIONS.GET_PERMISSION_CATEGORIES}/${id}`,
         method: HTTPMethod.DELETE,
       }),
       invalidatesTags: (result, error, id) => [{ type: PERMISSION_CATEGORY_INVALIDATE_TAG, id }],
