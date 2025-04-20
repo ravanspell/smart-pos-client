@@ -9,6 +9,7 @@ import {
     RowSelectionState,
     ColumnFiltersState,
     VisibilityState,
+    PaginationState,
 } from '@tanstack/react-table';
 import { Plus } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -45,15 +46,26 @@ const PermissionsPageSection: React.FC = () => {
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+    const [pagination, setPagination] = useState<PaginationState>({
+        pageIndex: 0,
+        pageSize: 10,
+    });
     const { handleError } = useErrorHandler();
     // State for the modal
     const [isModalOpen, setIsModalOpen] = useState(false);
-    // Fetch permissions from the API
-    const { data: permissions = [], isLoading, error } = useGetPermissionsQuery();
+    // Fetch permissions from the API with pagination
+    const { data, isLoading, error } = useGetPermissionsQuery({
+        page: pagination.pageIndex + 1,
+        limit: pagination.pageSize,
+    });
 
     if (error) {
         handleError(error);
     }
+
+    // Extract permissions and pagination data
+    const permissions = data?.items || [];
+    const totalCount = data?.meta?.totalItems || 0;
 
     return (
         <>
@@ -73,13 +85,15 @@ const PermissionsPageSection: React.FC = () => {
                     <DataTable
                         columns={columns}
                         data={permissions}
-                        totalCount={permissions.length}
+                        totalCount={totalCount}
                         columnFilters={columnFilters}
                         columnVisibility={columnVisibility}
                         rowSelection={rowSelection}
                         onColumnFiltersChange={setColumnFilters}
                         onColumnVisibilityChange={setColumnVisibility}
                         onRowSelectionChange={setRowSelection}
+                        onPaginationChange={setPagination}
+                        pagination={pagination}
                         loading={isLoading}
                         enableRowSelection={true}
                     />

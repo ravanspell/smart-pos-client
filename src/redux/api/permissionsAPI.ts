@@ -98,9 +98,24 @@ export const permissionsApi = createApi({
     }),
     
     // Permission endpoints
-    getPermissions: builder.query<Permission[], void>({
-      query: () => PERMISSIONS.GET_PERMISSIONS,
-      transformResponse: (response: ApiResponse<Permission[]>) => response.data,
+    getPermissions: builder.query<PaginatedResponse<Permission>, QueryParams<Permission>>({
+      query: (params) => {
+        // Construct the query string
+        const queryParams = new URLSearchParams();
+        
+        // Add pagination params
+        if (params.page) queryParams.append('page', params.page.toString());
+        if (params.limit) queryParams.append('limit', params.limit.toString());
+        
+        // Add sorting params
+        if (params.sortBy) queryParams.append('sortBy', params.sortBy.toString());
+        if (params.sortOrder) queryParams.append('sortOrder', params.sortOrder);
+        
+        return {
+          url: `${PERMISSIONS.GET_PERMISSIONS}?${queryParams.toString()}`,
+        };
+      },
+      transformResponse: (response: ApiResponse<PaginatedResponse<Permission>>) => response.data,
       providesTags: [{ type: PERMISSION_INVALIDATE_TAG, id: 'LIST' }],
     }),
     
