@@ -47,7 +47,7 @@ export interface DataTableProps<TData> {
   data: TData[]
   enableRowSelection?: boolean
   onSortingChange?: (updater: Updater<SortingState>) => void
-  onPaginationChange: (updater: Updater<PaginationState>) => void
+  onPaginationChange?: (updater: Updater<PaginationState>) => void
   onColumnFiltersChange?: (updater: Updater<ColumnFiltersState>) => void
   onColumnVisibilityChange?: (updater: Updater<VisibilityState>) => void
   onRowSelectionChange?: (updater: Updater<RowSelectionState>) => void
@@ -55,8 +55,8 @@ export interface DataTableProps<TData> {
   /**
    * Table states
    */
-  sorting: SortingState
-  pagination: PaginationState
+  sorting?: SortingState
+  pagination?: PaginationState
   columnFilters?: ColumnFiltersState
   columnVisibility?: VisibilityState
   rowSelection?: RowSelectionState
@@ -196,16 +196,18 @@ export function DataTable<TData>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="space-x-2">
-          <CustomPagination
-            totalRecords={totalCount}
-            itemsPerPage={pagination.pageSize}
-            currentPage={pagination.pageIndex + 1}
-            onPageChange={(page) => table.setPageIndex(page - 1)}
-          />
+      {pagination && (
+        <div className="flex items-center justify-end space-x-2 py-4">
+          <div className="space-x-2">
+            <CustomPagination
+              totalRecords={totalCount}
+              itemsPerPage={pagination.pageSize}
+              currentPage={pagination.pageIndex + 1}
+              onPageChange={(page) => table.setPageIndex(page - 1)}
+            />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
