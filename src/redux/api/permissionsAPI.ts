@@ -3,11 +3,22 @@ import { createApi } from '@reduxjs/toolkit/query/react';
 import HTTPMethod from 'http-method-enum';
 import { baseQuery } from './api';
 
+// Define the API response type
+export interface ApiResponse<T> {
+  statusCode: number;
+  msg: string | null;
+  success: boolean;
+  data: T;
+}
+
 // Define the PermissionCategory type
 export interface PermissionCategory {
   id: string;
   name: string;
   description: string;
+  displayOrder: number;
+  createdBy: string;
+  updatedBy: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -25,32 +36,9 @@ export const permissionsApi = createApi({
   baseQuery: baseQuery,
   tagTypes: [PERMISSION_CATEGORY_INVALIDATE_TAG],
   endpoints: (builder) => ({
-    getPermissionCategories: builder.query<PaginatedResponse<PermissionCategory>, QueryParams<PermissionCategory>>({
-      query: (params) => {
-        // Construct the query string
-        const queryParams = new URLSearchParams();
-        
-        // Add pagination params
-        if (params.page) queryParams.append('page', params.page.toString());
-        if (params.limit) queryParams.append('limit', params.limit.toString());
-        
-        // Add sorting params
-        if (params.sortBy) queryParams.append('sortBy', params.sortBy.toString());
-        if (params.sortOrder) queryParams.append('sortOrder', params.sortOrder);
-        
-        // Add filter params
-        if (params.filter) {
-          Object.entries(params.filter).forEach(([key, value]) => {
-            if (value) {
-              queryParams.append(`filter[${key}]`, value.toString());
-            }
-          });
-        }
-        
-        return {
-          url: `permission-categories?${queryParams.toString()}`,
-        };
-      },
+    getPermissionCategories: builder.query<PermissionCategory[], void>({
+      query: () => 'permission-categories',
+      transformResponse: (response: ApiResponse<PermissionCategory[]>) => response.data,
     }),
     
     getPermissionCategory: builder.query<PermissionCategory, string>({

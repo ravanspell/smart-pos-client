@@ -6,10 +6,9 @@ import { Button } from '@/components/atoms/Button';
 import { Separator } from '@/components/ui/separator';
 import {
     ColumnDef,
-    SortingState,
     RowSelectionState,
     ColumnFiltersState,
-    VisibilityState
+    VisibilityState,
 } from '@tanstack/react-table';
 import { Plus } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -36,12 +35,6 @@ const columns: ColumnDef<PermissionCategory>[] = [
 ];
 
 const PermissionsPage: React.FC = () => {
-    // State for pagination and sorting
-    const [pagination, setPagination] = useState({
-        pageIndex: 0,
-        pageSize: 10,
-    });
-    const [sorting, setSorting] = useState<SortingState>([]);
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -51,25 +44,11 @@ const PermissionsPage: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     // Fetch permission categories from the API
-    const { data, isLoading, error } = useGetPermissionCategoriesQuery({
-        page: pagination.pageIndex + 1,
-        limit: pagination.pageSize,
-        sortBy: sorting.length > 0 ? sorting[0].id : undefined,
-        sortOrder: sorting.length > 0 ? sorting[0].desc ? 'desc' : 'asc' : undefined,
-        filter: columnFilters.length > 0 ? columnFilters.reduce((acc, filter) => {
-            acc[filter.id] = filter.value;
-            return acc;
-        }, {} as Record<string, any>) : undefined,
-    });
+    const { data: permissionCategories = [], isLoading, error } = useGetPermissionCategoriesQuery();
 
-    // Handle API errors
     if (error) {
         handleError(error);
     }
-
-    // Extract data safely
-    const items = data?.items || [];
-    const totalItems = data?.meta?.totalItems || 0;
 
     return (
         <>
@@ -90,15 +69,11 @@ const PermissionsPage: React.FC = () => {
                 <div className="mt-4">
                     <DataTable
                         columns={columns}
-                        data={items}
-                        totalCount={totalItems}
-                        pagination={pagination}
-                        sorting={sorting}
+                        data={permissionCategories}
+                        totalCount={permissionCategories.length}
                         columnFilters={columnFilters}
                         columnVisibility={columnVisibility}
                         rowSelection={rowSelection}
-                        onPaginationChange={setPagination}
-                        onSortingChange={setSorting}
                         onColumnFiltersChange={setColumnFilters}
                         onColumnVisibilityChange={setColumnVisibility}
                         onRowSelectionChange={setRowSelection}
