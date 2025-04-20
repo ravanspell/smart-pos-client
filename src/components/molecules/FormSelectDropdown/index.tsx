@@ -1,21 +1,14 @@
-// components/atoms/CustomSelect.tsx
-import React from 'react';
-import { 
-  Select, 
-  SelectTrigger, 
-  SelectValue, 
-  SelectContent, 
-  SelectGroup, 
-  SelectLabel, 
-  SelectItem 
+'use client';
+
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectGroup,
+  SelectLabel,
+  SelectItem
 } from '@/components/atoms/Select';
-import { 
-  FormItem, 
-  FormLabel, 
-  FormControl, 
-  FormMessage, 
-  FormDescription 
-} from '@/components/atoms/Form';
 
 export interface FormSelectDropdownOption {
   label: string;
@@ -31,41 +24,34 @@ export interface FormSelectDropdownProps {
   onChange: (value: string) => void;
   className?: string;
   id: string;
+  name: string;
 }
 
 const FormSelectDropdown: React.FC<FormSelectDropdownProps> = ({
   label,
-  description,
   placeholder = '',
   options,
   value,
   onChange,
   className = '',
-  id,
+  name,
 }) => {
   return (
-    <FormItem id={id}>
-      <FormLabel>{label}</FormLabel>
-      {description && <FormDescription>{description}</FormDescription>}
-      <FormControl>
-        <Select onValueChange={onChange} value={value}>
-          <SelectTrigger className={className}>
-            <SelectValue placeholder={placeholder} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>{label}</SelectLabel>
-              {options.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </FormControl>
-      <FormMessage />
-    </FormItem>
+    <Select name={name} onValueChange={onChange} value={value}>
+      <SelectTrigger className={className}>
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>{label}</SelectLabel>
+          {options.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   );
 };
 
