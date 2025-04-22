@@ -17,6 +17,7 @@ export interface PermissionCategory {
   id: string;
   name: string;
   description: string;
+  key: string;
   displayOrder: number;
   createdBy: string;
   updatedBy: string;

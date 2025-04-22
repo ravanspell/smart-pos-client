@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -13,16 +14,26 @@ import { useGetPermissionCategoriesQuery } from '@/redux/api/permissionsAPI';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { toast } from 'sonner';
 import { CustomFormField } from '@/components/molecules/FormField';
-import { Switch } from '@/components/atoms/Switch';
+
+
+const FORM_FIELDS = {
+    DISPLAY_NAME: 'displayName',
+    TYPE: 'type',
+    CATEGORY_ID: 'categoryId',
+    DESCRIPTION: 'description',
+    IS_BASE_PERMISSION: 'isBasePermission',
+} as const;
 
 // Define the form schema with Zod
 const permissionFormSchema = z.object({
-    displayName: z.string().min(1, 'Display name is required'),
-    permissionKey: z.string().min(1, 'Permission key is required'),
-    description: z.string().min(1, 'Description is required'),
-    categoryId: z.string().min(1, 'Permission category is required'),
-    resource: z.string().min(1, 'Resource is required'),
-    isBasePermission: z.boolean().default(false),
+    [FORM_FIELDS.DISPLAY_NAME]: z.string().min(1, 'Display name is required'),
+    [FORM_FIELDS.TYPE]: z.enum(['CREATE', 'UPDATE', 'READ', 'DELETE'], {
+        required_error: 'Permission type is required',
+    }),
+    [FORM_FIELDS.CATEGORY_ID]: z.string().min(1, 'Permission category is required'),
+    [FORM_FIELDS.DESCRIPTION]: z.string().min(1, 'Description is required'),
+    [FORM_FIELDS.IS_BASE_PERMISSION]: z.boolean().default(false),
+    resource: z.string().default('permission'),
 });
 
 // Infer the type from the schema
@@ -33,27 +44,66 @@ interface PermissionFormProps {
     onClose: () => void;
 }
 
+const PERMISSION_TYPES = [
+    { label: 'Create', value: 'CREATE' },
+    { label: 'Update', value: 'UPDATE' },
+    { label: 'Read', value: 'READ' },
+    { label: 'Delete', value: 'DELETE' },
+] satisfies Array<{ label: string; value: string }>;
+
+/**
+ * PermissionForm component
+ * @param {PermissionFormProps} props - The component props
+ * @param {boolean} props.isOpen - Whether the modal is open
+ * @param {() => void} props.onClose - The function to call when the modal is closed
+ */
 const PermissionForm: React.FC<PermissionFormProps> = ({ isOpen, onClose }) => {
     const { handleError } = useErrorHandler();
     const [createPermission, { isLoading }] = useCreatePermissionMutation();
     const { data: categories = [] } = useGetPermissionCategoriesQuery();
+    const [categoryOptions, setCategoryOptions] = useState<Array<{ label: string; value: string }>>([]);
 
     const methods = useForm<PermissionFormValues>({
         resolver: zodResolver(permissionFormSchema),
         defaultValues: {
-            displayName: '',
-            permissionKey: '',
-            description: '',
-            categoryId: '',
-            resource: 'permission',
-            isBasePermission: false,
+            [FORM_FIELDS.DISPLAY_NAME]: '',
+            [FORM_FIELDS.TYPE]: undefined,
+            [FORM_FIELDS.DESCRIPTION]: '',
+            [FORM_FIELDS.CATEGORY_ID]: '',
+            [FORM_FIELDS.IS_BASE_PERMISSION]: false,
         },
     });
+
+    useEffect(() => {
+        // Transform categories to FormSelectDropdown options
+        const options = categories.map(category => ({
+            label: category.name,
+            value: category.id
+        }));
+        setCategoryOptions(options);
+    }, []);
+
+    /**
+     * Generates a permission key based on the type and category (preview key)
+     * @returns {string} The generated permission key
+     */
+    const generatePermissionKey = () => {
+        const type = methods.getValues(FORM_FIELDS.TYPE);
+        const categoryId = methods.getValues(FORM_FIELDS.CATEGORY_ID);
+        const category = categories.find(c => c.id === categoryId);
+        return type && category ? `${type}:${category.key.toUpperCase()}` : '';
+    };
 
     // Handle form submission
     const onSubmit = async (data: PermissionFormValues) => {
         try {
-            await createPermission(data).unwrap();
+            const payload = {
+                ...data,
+                resource: 'permission',
+                permissionKey: data[FORM_FIELDS.TYPE],
+                isBasePermission: false,
+            };
+            await createPermission(payload).unwrap();
             toast.success('Permission created successfully');
             onClose();
         } catch (error) {
@@ -61,68 +111,60 @@ const PermissionForm: React.FC<PermissionFormProps> = ({ isOpen, onClose }) => {
         }
     };
 
-    // Transform categories to FormSelectDropdown options
-    const categoryOptions = categories.map(category => ({
-        label: category.name,
-        value: category.id
-    }));
-
     return (
         <Modal
             isOpen={isOpen}
             onClose={onClose}
-            title="Create New Permission"
+            title="Create Permission"
         >
             <FormProvider {...methods}>
                 <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-4">
                     <CustomFormField
-                        name="displayName"
-                        label="Display Name"
+                        name={FORM_FIELDS.DISPLAY_NAME}
+                        label="Display name"
                     >
                         <Input placeholder="Enter display name" />
                     </CustomFormField>
 
                     <CustomFormField
-                        name="permissionKey"
-                        label="Permission Key"
-                    >
-                        <Input placeholder="Enter permission key" />
-                    </CustomFormField>
-
-                    <CustomFormField
-                        name="categoryId"
-                        label="Permission Category"
+                        name={FORM_FIELDS.TYPE}
+                        label="Type"
                     >
                         <FormSelectDropdown
-                            id="categoryId"
-                            name="categoryId"
-                            label="Permission Category"
+                            id={FORM_FIELDS.TYPE}
+                            name={FORM_FIELDS.TYPE}
+                            label="Type"
+                            placeholder="Select permission type"
+                            options={PERMISSION_TYPES}
+                            value={methods.watch(FORM_FIELDS.TYPE)}
+                            onChange={(value) => methods.setValue(FORM_FIELDS.TYPE, value as 'CREATE' | 'UPDATE' | 'READ' | 'DELETE')}
+                        />
+                    </CustomFormField>
+
+                    <CustomFormField
+                        name={FORM_FIELDS.CATEGORY_ID}
+                        label="Category"
+                    >
+                        <FormSelectDropdown
+                            id={FORM_FIELDS.CATEGORY_ID}
+                            name={FORM_FIELDS.CATEGORY_ID}
+                            label="Category"
                             placeholder="Select a category"
                             options={categoryOptions}
-                            value={methods.watch('categoryId')}
-                            onChange={(value) => methods.setValue('categoryId', value)}
+                            value={methods.watch(FORM_FIELDS.CATEGORY_ID)}
+                            onChange={(value) => methods.setValue(FORM_FIELDS.CATEGORY_ID, value)}
                         />
                     </CustomFormField>
 
-                    <CustomFormField
-                        name="resource"
-                        label="Resource"
-                    >
-                        <Input placeholder="Enter resource" />
-                    </CustomFormField>
+                    <div className="space-y-1.5">
+                        <label className="text-sm font-medium">Permission Key</label>
+                        <div className="flex h-10 w-full py-2 text-sm text-muted-foreground">
+                            {generatePermissionKey() || 'Select type and category to generate key'}
+                        </div>
+                    </div>
 
                     <CustomFormField
-                        name="isBasePermission"
-                        label="Base Permission"
-                    >
-                        <Switch
-                            checked={methods.watch('isBasePermission')}
-                            onCheckedChange={(checked) => methods.setValue('isBasePermission', checked)}
-                        />
-                    </CustomFormField>
-
-                    <CustomFormField
-                        name="description"
+                        name={FORM_FIELDS.DESCRIPTION}
                         label="Description"
                     >
                         <Textarea
@@ -136,7 +178,7 @@ const PermissionForm: React.FC<PermissionFormProps> = ({ isOpen, onClose }) => {
                             Cancel
                         </Button>
                         <Button type="submit" disabled={isLoading}>
-                            {isLoading ? 'Creating...' : 'Create Permission'}
+                            Save
                         </Button>
                     </div>
                 </form>
