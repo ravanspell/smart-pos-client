@@ -13,7 +13,7 @@ import {
 } from '@tanstack/react-table';
 import { Plus } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { useGetPermissionsQuery, Permission, PermissionsPaginatedResponse } from '@/redux/api/permissionsAPI';
+import { useGetPermissionsQuery, Permission } from '@/redux/api/permissionsAPI';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { Badge } from '@/components/atoms/Badge';
 

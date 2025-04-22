@@ -43,6 +43,7 @@ export interface Permission {
 // Define the request payload for creating a permission category
 export interface CreatePermissionCategoryRequest {
   name: string;
+  categoryKey: string;
   description: string;
 }
 
