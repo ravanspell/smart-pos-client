@@ -8,6 +8,7 @@ import {
     Users,
     File as FileIcon,
     Briefcase,
+    Building2
 } from "lucide-react"
 
 import { NavMain } from "./nav-main"
@@ -24,7 +25,8 @@ import {
     FILE_MANAGEMENT_ROUTE,
     DEFAULT_SETTINGS_ROUTE,
     CANDIDATES_ROUTE,
-    JOBS_ROUTE
+    JOBS_ROUTE,
+    ORGANIZATIONS_ROUTE
 } from "@/constants/routes"
 
 
@@ -79,6 +81,11 @@ const data = {
             title: "Settings",
             url: DEFAULT_SETTINGS_ROUTE,
             icon: Settings2,
+        },
+        {
+            title: "Organizations",
+            url: ORGANIZATIONS_ROUTE,
+            icon: Building2,
         },
     ],
 }
