@@ -25,11 +25,19 @@ export interface PermissionCategory {
   updatedAt: string;
 }
 
+export enum PermissionTypeEnum {
+  CREATE = 'CREATE',
+  UPDATE = 'UPDATE',
+  READ = 'READ',
+  DELETE = 'DELETE'
+}
+
+
 // Define the Permission type
 export interface Permission {
   id: string;
   displayName: string;
-  permissionKey: string;
+  key: string;
   description: string;
   categoryId: string;
   resource: string;
@@ -51,7 +59,7 @@ export interface CreatePermissionCategoryRequest {
 // Define the request payload for creating a permission
 export interface CreatePermissionRequest {
   displayName: string;
-  permissionKey: string;
+  type: PermissionTypeEnum;
   description: string;
   categoryId: string;
   resource: string;

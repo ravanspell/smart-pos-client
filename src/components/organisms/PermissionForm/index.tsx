@@ -9,7 +9,7 @@ import { Button } from '@/components/atoms/Button';
 import { Input } from '@/components/atoms/Input';
 import { Textarea } from '@/components/atoms/TextArea';
 import FormSelectDropdown from '@/components/molecules/FormSelectDropdown';
-import { useCreatePermissionMutation } from '@/redux/api/permissionsAPI';
+import { PermissionTypeEnum, useCreatePermissionMutation } from '@/redux/api/permissionsAPI';
 import { useGetPermissionCategoriesQuery } from '@/redux/api/permissionsAPI';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { toast } from 'sonner';
@@ -24,10 +24,23 @@ const FORM_FIELDS = {
     IS_BASE_PERMISSION: 'isBasePermission',
 } as const;
 
+
+type PermissionOption = {
+    label: string;
+    value: PermissionTypeEnum;
+};
+
+const PERMISSION_TYPES: PermissionOption[] = [
+    { label: 'Create', value: PermissionTypeEnum.CREATE },
+    { label: 'Update', value: PermissionTypeEnum.UPDATE },
+    { label: 'Read', value: PermissionTypeEnum.READ },
+    { label: 'Delete', value: PermissionTypeEnum.DELETE },
+];
+
 // Define the form schema with Zod
 const permissionFormSchema = z.object({
     [FORM_FIELDS.DISPLAY_NAME]: z.string().min(1, 'Display name is required'),
-    [FORM_FIELDS.TYPE]: z.enum(['CREATE', 'UPDATE', 'READ', 'DELETE'], {
+    [FORM_FIELDS.TYPE]: z.nativeEnum(PermissionTypeEnum, {
         required_error: 'Permission type is required',
     }),
     [FORM_FIELDS.CATEGORY_ID]: z.string().min(1, 'Permission category is required'),
@@ -43,13 +56,6 @@ interface PermissionFormProps {
     isOpen: boolean;
     onClose: () => void;
 }
-
-const PERMISSION_TYPES = [
-    { label: 'Create', value: 'CREATE' },
-    { label: 'Update', value: 'UPDATE' },
-    { label: 'Read', value: 'READ' },
-    { label: 'Delete', value: 'DELETE' },
-] satisfies Array<{ label: string; value: string }>;
 
 /**
  * PermissionForm component
@@ -100,7 +106,6 @@ const PermissionForm: React.FC<PermissionFormProps> = ({ isOpen, onClose }) => {
             const payload = {
                 ...data,
                 resource: 'permission',
-                permissionKey: data[FORM_FIELDS.TYPE],
                 isBasePermission: false,
             };
             await createPermission(payload).unwrap();
@@ -137,7 +142,7 @@ const PermissionForm: React.FC<PermissionFormProps> = ({ isOpen, onClose }) => {
                             placeholder="Select permission type"
                             options={PERMISSION_TYPES}
                             value={methods.watch(FORM_FIELDS.TYPE)}
-                            onChange={(value) => methods.setValue(FORM_FIELDS.TYPE, value as 'CREATE' | 'UPDATE' | 'READ' | 'DELETE')}
+                            onChange={(value) => methods.setValue(FORM_FIELDS.TYPE, value as PermissionTypeEnum)}
                         />
                     </CustomFormField>
 
