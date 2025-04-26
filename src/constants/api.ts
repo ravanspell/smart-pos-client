@@ -36,6 +36,13 @@ export const JOBS = {
     DELETE_JOB: 'v1/jobs'
 }
 
+export const ORGANIZATIONS = {
+    GET_ORGANIZATIONS: 'v1/organization',
+    CREATE_ORGANIZATION: 'v1/organization',
+    UPDATE_ORGANIZATION: 'v1/organization',
+    DELETE_ORGANIZATION: 'v1/organization'
+}
+
 export const PERMISSIONS = {
     GET_PERMISSION_CATEGORIES: 'v1/permission-categories',
     CREATE_PERMISSION_CATEGORY: 'v1/permission-categories',
