@@ -9,6 +9,7 @@ import { Eye, Pencil, Trash } from 'lucide-react';
 import { useGetOrganizationsQuery } from '@/redux/api/organizationsAPI';
 import { SortableColumnHeader } from '@/components/molecules/SortableColumnHeader';
 import { RoundedAvatar } from '@/components/atoms/RoundedAvatar';
+import { ORGANIZATION_DETAILS_ROUTE } from '@/constants/routes';
 
 interface Organization {
   id: string;
@@ -85,7 +86,7 @@ const OrganizationList = () => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => router.push(`/dashboard/organizations/${organization.id}`)}
+              onClick={() => router.push(`${ORGANIZATION_DETAILS_ROUTE}?id=${organization.id}`)}
             >
               <Eye className="w-4 h-4" />
             </Button>

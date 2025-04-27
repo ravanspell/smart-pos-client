@@ -15,3 +15,4 @@ export const DEFAULT_SETTINGS_ROUTE = '/dashboard/settings/general';
 export const PERMISSIONS_ROUTE = '/dashboard/settings/permissions';
 // Organizations
 export const ORGANIZATIONS_ROUTE = '/dashboard/organizations';
+export const ORGANIZATION_DETAILS_ROUTE = '/dashboard/organizations/details';

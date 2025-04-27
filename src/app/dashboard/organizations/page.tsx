@@ -3,7 +3,7 @@
 import { Button } from '@/components/atoms/Button';
 import { Plus } from 'lucide-react';
 import { PageContainer } from '@/components/atoms/PageContainer';
-import OrganizationList from '@/components/molecules/OrganizationList';
+import OrganizationList from '@/components/organisms/OrganizationList';
 
 function OrganizationsPage() {
   return (
